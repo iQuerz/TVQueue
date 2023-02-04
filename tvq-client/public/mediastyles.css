@@ -1,0 +1,11 @@
+.media-list-container{
+    width: 70vw;
+    overflow: auto!important;
+    white-space: nowrap!important;
+}
+
+.media-list-element{
+    display: inline-block;
+    margin: 0.5em;
+    white-space: normal!important;
+}

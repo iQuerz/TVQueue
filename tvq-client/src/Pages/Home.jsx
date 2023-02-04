@@ -1,6 +1,7 @@
-import { Card,Box, Typography } from "@mui/material";
+import { Card,Box,Paper,Typography } from "@mui/material";
 import { useState } from "react";
 import MediaItem from "../Components/Custom/MediaItem";
+import MediaList from "../Components/Custom/MediaList";
 import MediaCarousel from "../Home/MediaCarousel";
 
 
@@ -13,8 +14,9 @@ function HomePage() {
 
     console.log(displayMedia)
   return (
-    <Box>
+    <Box className="flex-down">
         <MediaCarousel media={displayMedia} onChange={handleDisplayMediaChange}/>
+        <MediaList media={displayMedia}></MediaList>
         <Typography> Test lista</Typography>
         <Card className="flex-right" >
             {

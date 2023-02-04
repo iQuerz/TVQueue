@@ -1,44 +1,43 @@
 import {
-  Card,
-  CardActionArea,
-  CardMedia,
-  Typography,
-  CardContent,
-  Button,
-  CardActions,
+    Card,
+    CardActionArea,
+    CardMedia,
+    Typography,
+    CardContent,
+    Button,
+    CardActions,
 } from "@mui/material";
+import { Box } from "@mui/system";
 import { useState } from "react";
 
 function MediaItem(props) {
     const [hover, setHover] = useState(false);
 
-  return (
-    <Card sx={{ maxWidth: 400 }}>
-      <CardActionArea
-                onMouseEnter={() => setHover(true)}
-                onMouseLeave={() => setHover(false)}>
-        <CardMedia
-          sx={{ height: 150}}
-          image={props.media.picture}
-          title={props.media.name}
+    return (
+        <Card className={props.className} sx={{ minWidth:"12em", width:"12em", height:"25em" }}
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}>
+            <Box className="flex-down" sx={{justifyContent:"space-between"}}>
+                <CardActionArea>
+                    <CardMedia
+                        sx={{ height: "15em" }}
+                        title={props.media.name}
+                        image={props.media.picture}
+                    />
+                </CardActionArea>
+                <CardContent>
+                    <Typography variant="h6" component="div">
+                        {props.media.name}
+                    </Typography>
+                </CardContent>
 
-        />
-              </CardActionArea>
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            {props.media.name}
-          </Typography>
-            <Typography variant="body2" color="text.secondary">
-                {props.media.description}
-            </Typography>
-        </CardContent>        
-        <CardActions>
-            <Button size="small">More</Button>
-            <Button size="small">Add to</Button>
-          </CardActions>
-
-    </Card>
-  );
+                <CardActions className="flex-right">
+                    <Button size="medium">More</Button>
+                    <Button size="medium">Add to</Button>
+                </CardActions>
+            </Box>
+        </Card>
+    );
 }
 
 export default MediaItem;
