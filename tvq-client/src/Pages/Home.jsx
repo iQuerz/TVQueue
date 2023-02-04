@@ -17,30 +17,6 @@ function HomePage() {
     <Box className="flex-down">
         <MediaCarousel media={displayMedia} onChange={handleDisplayMediaChange}/>
         <MediaList media={displayMedia}></MediaList>
-        <Typography> Test lista</Typography>
-        <Card className="flex-right" >
-            {
-                displayMedia.map((media,index) =>{
-                    return <MediaItem key={index} media={media}> </MediaItem>
-                })
-            } 
-        </Card>
-        <Typography> Test lista</Typography>
-        <Card className="flex-right">
-            {
-                displayMedia.map((media,index) =>{
-                    return <MediaItem key={index} media={media}> </MediaItem>
-                })
-            } 
-        </Card>
-        <Typography> Test lista</Typography>
-        <Card className="flex-right">
-            {
-                displayMedia.map((media,index) =>{
-                    return <MediaItem key={index} media={media}> </MediaItem>
-                })
-            } 
-        </Card>
     </Box>
   );
 }

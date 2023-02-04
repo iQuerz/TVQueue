@@ -1,4 +1,5 @@
 import { Button } from "@mui/material";
+import { Box } from "@mui/system";
 import { useEffect } from "react";
 
 function MediaCarousel(props) {
@@ -103,17 +104,17 @@ function MediaCarousel(props) {
   function HandleTrending() {}
   function HandleUpcoming() {}
   function HandleRecentlyViewed() {}
-  return (
-    <header>
-      <nav>
-        <Button onClick={HandleLatestMovies}>Latest movies</Button>
-        <Button onClick={HandleLatestShows}>Latest shows</Button>
-        <Button onClick={HandleOurPicks}>Our picks</Button>
-        <Button onClick={HandleTrending}>Trending</Button>
-        <Button onClick={HandleUpcoming}>Upcoming</Button>
-        <Button onClick={HandleRecentlyViewed}>Recently Viewed</Button>
-      </nav>
-    </header>
-  );
+    return (
+        <header className="media-carousel-header">
+            <nav>
+                <Button onClick={HandleLatestMovies}>Latest movies</Button>
+                <Button onClick={HandleLatestShows}>Latest shows</Button>
+                <Button onClick={HandleOurPicks}>Our picks</Button>
+                <Button onClick={HandleTrending}>Trending</Button>
+                <Button onClick={HandleUpcoming}>Upcoming</Button>
+                <Button onClick={HandleRecentlyViewed}>Recently Viewed</Button>
+            </nav>
+        </header>
+    );
 }
 export default MediaCarousel;

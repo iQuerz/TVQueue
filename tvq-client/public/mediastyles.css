@@ -1,5 +1,5 @@
 .media-list-container{
-    width: 70vw;
+    width: var(--ui-width);
     overflow: auto!important;
     white-space: nowrap!important;
 }
@@ -8,4 +8,12 @@
     display: inline-block;
     margin: 0.5em;
     white-space: normal!important;
+}
+
+.media-carousel-container{
+    width: var(--ui-width);
+}
+
+.media-carousel-header{
+    width: var(--ui-width);
 }

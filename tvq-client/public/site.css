@@ -11,6 +11,8 @@
     --white: #eee;
     --black: #222;
     --black-hover: #444;
+
+    --ui-width: 70vw;
 }
 body{
     width: 100vw;
