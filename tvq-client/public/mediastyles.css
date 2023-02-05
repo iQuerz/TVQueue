@@ -29,3 +29,28 @@
 .media-grid-element{
     margin: 0.5em;
 }
+
+
+.media-image{
+    height: 50vh;
+
+}
+
+.media-section{
+    padding: 1em 0em;
+    margin: 0;
+    border: 2px solid var(--foreground);
+    border-width: 1px 0;
+    width: var(--ui-width);
+}
+
+.tag-bubble{
+    padding: 0.2em 0.5em;
+    margin: 0.1em;
+    border-radius: 1em;
+    background-color: var(--orange);
+    cursor: pointer;
+}
+    .tag-bubble:hover{
+        transform: scale(1.2);
+    }

@@ -10,8 +10,8 @@ import {
 import { useEffect } from "react";
 import { useState } from "react";
 import { useRef } from "react";
-import MediaItem from "../Components/Custom/MediaItem";
-import MediaList from "../Components/Custom/MediaList";
+import MediaItem from "../Components/Media/MediaItem";
+import MediaList from "../Components/Media/MediaList";
 
 function ProfilePage() {
   const email = useRef("Piksi@email.com");

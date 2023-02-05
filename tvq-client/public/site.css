@@ -1,9 +1,10 @@
 :root{
-    --green: #9fb8a9;
-    --blue: #728c9a;
-    --brown: #9a9071;
-    --pink: #9a7174;
-    --purple: #79719a;
+    --background: #a7cdc2;
+    --foreground: #072a3e;
+    --orange: #de5920;
+    --orange-hover: #e48645;
+    --yellow: #f3b546;
+    --cyan: #59bfd4;
 
     --success: #198754;
     --error: #7f0000;
@@ -19,11 +20,13 @@ body{
     height: 100vh;
     padding: 0;
     margin: 0;
-    background-color: #728d9f;
+    background-color: var(--background);
 }
 *{
     padding: 0;
     margin: 0;
+    color: var(--foreground)!important;
+    transition-duration: 100ms;
 }
 #root{
     width: 100vw;
@@ -114,27 +117,42 @@ body{
     height: 30px;
     border-radius: 50%;
     margin-right: 3px;
-  }
+}
 
-  header nav {
+/* .navbar{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
-    background-color: #333;
-  }
-  
-  header nav a {
-    color: white;
-    text-decoration: none;
-    padding: 10px 20px;
-    display: block;
-  }
-  
-  header nav a:hover {
-    background-color: #444;
-  }
+    background-color: var(--orange);
+} */
 
+header nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--foreground);
+} 
+header nav a {
+    color: var(--orange)!important;
+    text-decoration: none;
+    padding: 20px 40px;
+    display: block;
+    flex-grow: 1;
+    font-size: 1.5em;
+    font-weight: 600;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+}
+    header button{
+        color: var(--orange)!important;
+    }
+    header nav a:hover {
+        background-color: var(--cyan);
+    }
+
+.media-section button{
+    background-color: var(--orange)!important;
+}
 
 .media{
     height: 140,

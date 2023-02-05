@@ -1,9 +1,9 @@
 import { Card,Box,Paper,Typography } from "@mui/material";
 import { useState } from "react";
-import MediaGrid from "../Components/Custom/MediaGrid";
-import MediaItem from "../Components/Custom/MediaItem";
-import MediaList from "../Components/Custom/MediaList";
-import MediaCarousel from "../Home/MediaCarousel";
+import MediaGrid from "../Components/Media/MediaGrid";
+import MediaItem from "../Components/Media/MediaItem";
+import MediaList from "../Components/Media/MediaList";
+import MediaCarousel from "../Components/Media/MediaCarousel";
 
 
 function HomePage() {
