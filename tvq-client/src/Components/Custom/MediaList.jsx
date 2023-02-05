@@ -11,7 +11,7 @@ function MediaList(props) {
 
     return (
         <Box height={"40vh"} margin={"3em"}>
-            <Typography variant="h4">Featured:</Typography>
+            <Typography variant="h4">{props.title}:</Typography>
             <Card className="media-list-container" variant="outlined" sx={{ width:"70vw", backgroundColor:"transparent"}}>
                 {
                     props.media.map((media, index) =>{

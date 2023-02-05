@@ -18,7 +18,7 @@ function HomePage() {
     <Box className="flex-down">
         <MediaCarousel media={displayMedia} onChange={handleDisplayMediaChange}/>
         <MediaGrid media={displayMedia}></MediaGrid>
-        <MediaList media={displayMedia}></MediaList>
+        <MediaList title={"Featured"} media={displayMedia}></MediaList>
     </Box>
   );
 }

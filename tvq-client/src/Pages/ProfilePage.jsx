@@ -130,27 +130,26 @@ function ProfilePage() {
       },
     ]);
   }
-  return (
-    <Container>
-      <Avatar
-        alt={name.current}
-        src={picture.current}
-        sx={{ width: 112, height: 112 }}
-      />
-
-      <Typography variant="h5">{name.current}</Typography>
-      <Typography variant="body1">Email: {email.current}</Typography>
-
-      <Typography variant="h5" component="h2">
-        Watched Movies
-      </Typography>
-      <Box>
-            <MediaList media={watchedMedia}></MediaList>
-            <MediaList media={toWatchMedia}></MediaList>
-            <MediaList media={currentlyWatching}></MediaList>
-      </Box>
-    </Container>
-  );
+    return (
+        <Box className="flex-down">
+            <Box className="flex-right margin">
+                <Avatar
+                    alt={name.current}
+                    src={picture.current}
+                    sx={{ width: 112, height: 112 }}
+                />
+                <Box className="flex-down margin">
+                    <Typography variant="h5">{name.current}</Typography>
+                    <Typography variant="body1">{email.current}</Typography>
+                </Box>
+            </Box>
+            <Box>
+                    <MediaList title="Currently Watching" media={currentlyWatching}></MediaList>
+                    <MediaList title="To Watch" media={toWatchMedia}></MediaList>
+                    <MediaList title="Watched" media={watchedMedia}></MediaList>
+            </Box>
+        </Box>
+    );
 }
 
 export default ProfilePage;
