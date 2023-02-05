@@ -14,7 +14,7 @@ router.route("/:tagId")
     .delete(_tag.deleteTag)
 
 router.route("/:tagId/media")
-    .get(_tag.getAllCustomMediaInTag)
+    .get(_tag.filterCustomMediaInTag)
     .post(_mw.checker.isBodyEmpty, _tag.addCustomMediaInTag)
 
 router.route("/:tagId/media/:mediaId")

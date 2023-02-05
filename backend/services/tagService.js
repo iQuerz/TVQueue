@@ -6,6 +6,7 @@ const _code = require("../helpers/statusCodes")
 const _msg = require("../helpers/msg")
 const _mw = require("../helpers/middlewares")
 
+const validator = { runValidators: true }
 //==============================================================================================================================================//
 //#region Tags
 
@@ -61,20 +62,71 @@ const patchTag = asyncHandler(async (req, res) => {
 const deleteTag = asyncHandler(async (req, res) => {
     const tagId = req.params.tagId
 
+    const exist = await _tagContext.exists({ _id: tagId })
+    if(!exist) _mw.error.send(res, _code.notFound, _msg.tagNotFound)
+
     const deletedTag = await _tagContext.findByIdAndDelete({ _id: tagId })
     
     res.status((deletedTag) ? _code.ok : _code.noContent).json(_msg.deletedTag)
 })
+
 //#endregion
 //==============================================================================================================================================//
 //#region Tags + CustomMedia
 
-//GET: "/api/tags/:tagId/media"
+//GET: "/api/tags/:tagId/media?"
 //Description: Povlaci spisak svih media u tag-u
-const getAllCustomMediaInTag = asyncHandler(async (req, res) => {
-    const tagId = req.params.tagId
-    
-    const { mediaEmbedded} = await _tagContext.findOne({ _id: tagId }, { mediaEmbedded: 1, _id: 0}).lean();
+const filterCustomMediaInTag = asyncHandler(async (req, res) => {
+    const tagId = new mongoose.Types.ObjectId(req.params.tagId)
+    let { type, name, fromDate, toDate, order, skip, limit} = req.query
+
+    //Query setup
+    let objQuery = { "$and": []}
+
+    if(type) objQuery["$and"].push({ "$eq": ["$$media.type", type] })
+    if(name) objQuery["$and"].push({ $regexMatch: { input: "$$media.name", regex: name, options: "i" } })
+
+    fromDate = (fromDate) ? new Date(fromDate) : new Date("2019")
+    toDate = (toDate) ? new Date(toDate) : new Date("2024")
+    objQuery["$and"].push({ "$and": [{"$gte": ["$$media.airedDate", fromDate]}, {"$lte": ["$$media.airedDate", toDate]}] })
+
+    order = parseInt((order === "asc") ? 1 : -1)
+    skip = parseInt((skip) ?? 0)
+    limit = parseInt((limit) ?? 10)
+
+
+    const { mediaEmbedded} = (await _tagContext.aggregate([
+        { $match: { 
+            _id: tagId,
+        }},
+        { $project: {
+            _id: 0,
+            mediaEmbedded: { 
+                $filter: {
+                    input: "$mediaEmbedded",
+                    as: "media",
+                    cond: objQuery
+                }            
+            }
+        }},
+        { $project: {
+            _id: 0,
+            mediaEmbedded: { 
+                $sortArray: {
+                    input: "$mediaEmbedded",
+                    sortBy: { rating: order }
+                    }
+                }
+            }
+        },
+        { $project: {
+            _id: 0,
+            mediaEmbedded: { $slice: ["$mediaEmbedded", skip, limit] }
+            }
+        },
+    ], 
+    {$limit: 1}    
+    ))[0]
 
     res.status((mediaEmbedded.length) ? _code.ok : _code.noContent).json(mediaEmbedded)
 })
@@ -85,7 +137,13 @@ const addCustomMediaInTag = asyncHandler(async (req, res) => {
     const tagId = req.params.tagId
     const customMedia = req.body
 
-    await _tagContext.updateOne({ _id: tagId}, { $push: { mediaEmbedded: customMedia}})
+    const exist = await _tagContext.exists({ _id: tagId, "mediaEmbedded._id": customMedia._id})    
+    if(exist) _mw.error.send(res, _code.badRequest, _msg.existCustomMediaInTag)
+
+    const result = await _tagContext.updateOne({ _id: tagId}, { $push: { mediaEmbedded: customMedia}}, validator)
+    
+    if (result.modifiedCount === 0)
+        _mw.error.send(res, _code.noContent, "")
 
     res.status(_code.created).json(_msg.addedMediaToTag)
 })
@@ -105,8 +163,12 @@ const updateCustomMediaInTag = asyncHandler(async (req, res) => {
     if (customMedia.rating) objQuery["mediaEmbedded.$.rating"] = customMedia.rating
     if (customMedia.airedDate) objQuery["mediaEmbedded.$.airedDate"] = customMedia.airedDate
 
-    await _tagContext.updateOne({ _id: tagId, "mediaEmbedded._id": customMedia._id}, { $set: objQuery})
-    res.status(_code.created).json(_msg.updatedMediaInTag)
+    const result = await _tagContext.updateOne({ _id: tagId, "mediaEmbedded._id": customMedia._id}, { $set: objQuery}, validator)
+
+    if (result.modifiedCount === 0)
+        _mw.error.send(res, _code.notFound, _msg.mediaInTagNotFound)
+
+    res.status(_code.ok).json(_msg.updatedMediaInTag)
 })
 
 //DELETE: "/api/tags/:tagId/media/:mediaId" 
@@ -114,10 +176,14 @@ const updateCustomMediaInTag = asyncHandler(async (req, res) => {
 const deleteCustomMediaInTag = asyncHandler(async (req, res) => {
     const { tagId, mediaId } = req.params
 
+    const exist = await _tagContext.exists({ _id: tagId, "mediaEmbedded._id": mediaId})
+    if(!exist) _mw.error.send(res, _code.notFound, _msg.mediaInTagNotFound)
+
     await _tagContext.updateOne({ _id: tagId }, { $pull: { mediaEmbedded: { _id: mediaId }}})
 
-    res.status(_code.created).json(_msg.deletedMediaInTag)
+    res.status(_code.ok).json(_msg.deletedMediaInTag)
 })
+
 //#endregion
 //==============================================================================================================================================//
 module.exports = {
@@ -129,7 +195,7 @@ module.exports = {
     deleteTag,
 
     //Tags + CustomMedia
-    getAllCustomMediaInTag,
+    filterCustomMediaInTag,
     addCustomMediaInTag,
     updateCustomMediaInTag,
     deleteCustomMediaInTag

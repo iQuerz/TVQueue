@@ -8,11 +8,16 @@ module.exports = {
     requiredBody: "Body is required for this method",
     requireTagId: "Tag ID is required",
 
-    //Exist
-    existName: (name) => { return `The name ${name} already exists`},
-
     //Wrong
     wrongPassword: "Wrong password entered",
+
+    //Exist: true
+    existName: (name) => { return `The name ${name} already exists`},
+    existCustomMediaInTag: "Media that you tried to insert in the tag already exists",
+
+    //Not found
+    mediaInTagNotFound: "Media in the tag was not found",
+    tagNotFound: "The tag was not found",   
 
     //Success
     addedMediaToTag: "Successfully inserted media in the tag",

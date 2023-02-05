@@ -9,7 +9,7 @@ const tagSchema = new mongoose.Schema({
     mediaEmbedded: { 
         type: [{
         _id: { type: mongoose.ObjectId, index: true },
-        type: { type: String, index: true },
+        type: { type: String, enum: ["Movie", "TV Show", "Episode"], index: true },
         picture: String,
         name: String,
         rating: { type: Number, index: true },
