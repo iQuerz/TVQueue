@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 
-const _code = require("../utils/statusCodes")
-const _msg = require("../utils/msg")
+const _code = require("../helpers/statusCodes")
+const _msg = require("../helpers/msg")
 
 //Schema definition
 const mediaSchema = mongoose.Schema({

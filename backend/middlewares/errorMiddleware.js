@@ -1,4 +1,4 @@
-const errorHandler = (err, req, res, next) => {
+const handler = (err, req, res, next) => {
     const statusCode = res.statusCode ?? 500
 
     res.status(statusCode).json({ 
@@ -7,6 +7,12 @@ const errorHandler = (err, req, res, next) => {
     })
 }
 
+const send = (res, code, msg) => {
+    res.status(code)
+    throw new Error(msg)
+}
+
 module.exports = {
-    errorHandler
+    handler,
+    send
 }

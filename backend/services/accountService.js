@@ -1,8 +1,8 @@
 const asyncHandler = require("express-async-handler")
 
 const _accountService = require("../models/accountModel")
-const _code = require("../utils/statusCodes")
-const _msg = require("../utils/msg")
+const _code = require("../helpers/statusCodes")
+const _msg = require("../helpers/msg")
 
 const getAllAccounts = asyncHandler( async (req, res) => {
     if (!req && !res)

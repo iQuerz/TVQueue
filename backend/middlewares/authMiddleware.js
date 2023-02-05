@@ -1,9 +1,11 @@
-const checkAuthentication = () => {
+const checkAuthentication = (req, res, next) => {
     console.log("Check Authentication")
+    next()
 }
 
-const checkAuthorization = () => {
+const checkAuthorization = (req, res, next) => {
     console.log("Check Authorization")
+    next()
 }
 
 module.exports = {

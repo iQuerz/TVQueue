@@ -1,19 +1,19 @@
 const mongoose = require("mongoose")
 
-const _code = require("../utils/statusCodes")
-const _msg = require("../utils/msg")
+const _code = require("../helpers/statusCodes")
+const _msg = require("../helpers/msg")
 
 //Schema definition
 const tagSchema = new mongoose.Schema({
     name: { type: String, required: [true, _msg.requiredName], unique: true },
     mediaEmbedded: { 
         type: [{
-        _id: mongoose.ObjectId,
-        type: { type: String, index: true},
+        _id: { type: mongoose.ObjectId, index: true },
+        type: { type: String, index: true },
         picture: String,
         name: String,
-        rating: Number,
-        airedDate: { type: Date, index: true}
+        rating: { type: Number, index: true },
+        airedDate: { type: Date, index: true }
     }],
     required: false
     }
@@ -24,7 +24,9 @@ const tagSchema = new mongoose.Schema({
 
 //Indexes
 tagSchema.index(
+    { "mediaEmbedded._id": 1 },
     { "mediaEmbedded.type": 1 },
+    { "mediaEmbedded.rating": -1 },
     { "mediaEmbedded.airedDate": -1 }
 )
 

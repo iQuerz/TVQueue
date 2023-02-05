@@ -1,12 +1,11 @@
 //Require
 const express = require("express")
 
-const mongoCfg = require("./configs/mongodb")
-const _serverCfg = require("./configs/server")
-const _error = require("./middlewares/errorMiddleware")
+const _cfg = require("./helpers/configs")
+const _mw = require("./helpers/middlewares")
 
 //Setup main
-mongoCfg.connectDB();
+_cfg.mongo.connectDB();
 const app = express()
 
 //Setup middleware
@@ -19,6 +18,6 @@ app.use("/api/accounts", require("./routes/accountRoute"))
 app.use("/api/media", require("./routes/mediaRoute"))
 app.use("/api/tags", require("./routes/tagRoute"))
 
-app.use(_error.errorHandler)
+app.use(_mw.error.handler)
 
-app.listen(_serverCfg.port, () => console.log(`Server started - localhost:${_serverCfg.port}`))
+app.listen(_cfg.server.port, () => console.log(`Server started - localhost:${_cfg.server.port}`))
