@@ -1,9 +1,16 @@
 import { Card,Box,Paper,Typography, Avatar, Button } from "@mui/material";
+import { useEffect } from "react";
 import { useRef } from "react";
 import TagBubble from "../Components/Custom/TagBubble";
 
 
 function MediaPage() {
+    const mediaID = useRef();
+    useEffect(()=>{
+        mediaID.current = window.localStorage.getItem('pickedMedia');
+        //fetch u media posle
+    },[])
+
     const media = useRef(
         {
             name: "Shrek",

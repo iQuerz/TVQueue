@@ -12,6 +12,7 @@ function MediaCarousel(props) {
     props.onChange([
       {
         name: "Shrek",
+        rating: 2,
         picture:
           "https://m.media-amazon.com/images/M/MV5BOGZhM2FhNTItODAzNi00YjA0LWEyN2UtNjJlYWQzYzU1MDg5L2ltYWdlL2ltYWdlXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_FMjpg_UX1000_.jpg",
         description:
@@ -19,6 +20,7 @@ function MediaCarousel(props) {
       },
       {
         name: "Avatar: The Way of Water",
+        rating: 3,
         picture:
           "https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjQxNTE1MDA@._V1_FMjpg_UX1000_.jpg",
         description:
@@ -26,6 +28,7 @@ function MediaCarousel(props) {
       },
       {
         name: "The Dark Knight",
+        rating: 3,
         picture:
           "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_FMjpg_UX1000_.jpg",
         description:
@@ -33,6 +36,7 @@ function MediaCarousel(props) {
       },
       {
         name: "Inception",
+        rating: 4,
         picture:
           "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_FMjpg_UX1000_.jpg",
         description:
@@ -40,6 +44,7 @@ function MediaCarousel(props) {
       },
       {
         name: "The Godfather",
+        rating: 5,
         picture:
           "https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_FMjpg_UX214_CR0,0,214,317_AL_.jpg",
         description:
@@ -47,17 +52,55 @@ function MediaCarousel(props) {
       },
       {
         name: "The Shawshank Redemption",
+        rating: 1,
         picture:
           "https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_FMjpg_UX214_CR0,0,214,317_AL_.jpg",
         description:
           "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
       },
+      {
+        name: "The Lord of the Rings: The Return of the King",
+        rating: 4,
+        picture: "https://m.media-amazon.com/images/M/MV5BNzA5ZDNlZWMtM2NhNS00NDJjLTk4NDItYTRmY2EwMWZlMTY3XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_FMjpg_UX214_CR0,0,214,317_AL_.jpg",
+        description: "Gandalf and Aragorn lead the World of Men against Sauron's army to draw his gaze from Frodo and Sam as they approach Mount Doom with the One Ring."
+      },
+      {
+        name: "Pulp Fiction",
+        rating: 5,
+        picture: "https://m.media-amazon.com/images/M/MV5BMTkxMTA5OTAzMl5BMl5BanBnXkFtZTgwNjA5MDc3NjE@._V1_FMjpg_UX214_CR0,0,214,317_AL_.jpg",
+        description: "The lives of two mob hit men, a boxer, a gangster's wife, and a pair of diner bandits intertwine in four tales of violence and redemption."
+        },
+        {
+        name: "The Matrix",
+        rating: 4,
+        picture: "https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_FMjpg_UX214_CR0,0,214,317_AL_.jpg",
+        description: "A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers."
+        },
+        {
+        name: "The Silence of the Lambs",
+        rating: 3,
+        picture: "https://m.media-amazon.com/images/M/MV5BMTQ2NzkzMDI4OF5BMl5BanBnXkFtZTcwMDA0NzE1NA@@._V1_FMjpg_UX214_CR0,0,214,317_AL_.jpg",
+        description: "A young FBI cadet must receive the help of an imprisoned and manipulative cannibal killer to help catch another serial killer, a madman who skins his victims."
+        },
+        {
+        name: "The Departed",
+        rating: 1,
+        picture: "https://flxt.tmsimg.com/assets/p162564_p_v8_ag.jpg",
+        description: "An undercover cop and a mole in the police attempt to identify each other while infiltrating an Irish gang in South Boston."
+        },
+        {
+        name: "Schindler's List",
+        rating: 2,
+        picture: "https://m.media-amazon.com/images/M/MV5BNDE4OTMxMTctNmRhYy00NWE2LTg3YzItYTk3M2UwOTU5Njg4XkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg",
+        description: "In German-occupied Poland during World War II, Oskar Schindler gradually becomes concerned for his Jewish workforce after witnessing their persecution by the Nazi Germans."
+        }
     ]);
   }
   function HandleLatestShows() {
     props.onChange([
       {
         name: "Breaking Bad",
+        rating: 5,
         picture:
           "https://m.media-amazon.com/images/M/MV5BYTU3NWI5OGMtZmZhNy00MjVmLTk1YzAtZjA3ZDA3NzcyNDUxXkEyXkFqcGdeQXVyODY5Njk4Njc@._V1_.jpg",
         description:
@@ -65,6 +108,7 @@ function MediaCarousel(props) {
       },
       {
         name: "Game of Thrones",
+        rating: 4,
         picture:
           "https://m.media-amazon.com/images/M/MV5BMjE3NTQ1NDg1Ml5BMl5BanBnXkFtZTgwNzY2NDA0MjI@._V1_FMjpg_UX214_CR0,0,214,317_AL_.jpg",
         description:
@@ -72,6 +116,7 @@ function MediaCarousel(props) {
       },
       {
         name: "The Sopranos",
+        rating: 5,
         picture:
           "https://m.media-amazon.com/images/I/818TrulDKmL._AC_SL1500_.jpg",
         description:
@@ -79,6 +124,7 @@ function MediaCarousel(props) {
       },
       {
         name: "The Wire",
+        rating: 2,
         picture:
           "https://ntvb.tmsimg.com/assets/p7892928_b_h10_ab.jpg?w=960&h=540",
         description:
@@ -86,6 +132,7 @@ function MediaCarousel(props) {
       },
       {
         name: "Friends",
+        rating: 5,
         picture:
           "https://m.media-amazon.com/images/M/MV5BNDVkYjU0MzctMWRmZi00NTkxLTgwZWEtOWVhYjZlYjllYmU4XkEyXkFqcGdeQXVyNTA4NzY1MzY@._V1_FMjpg_UX214_CR0,0,214,317_AL_.jpg",
         description:
@@ -93,11 +140,43 @@ function MediaCarousel(props) {
       },
       {
         name: "The Last of us",
+        rating: 5,
         picture:
           "https://image.api.playstation.com/vulcan/ap/rnd/202206/0720/eEczyEMDd2BLa3dtkGJVE9Id.png",
         description:
           "After a global pandemic destroys civilization, a hardened survivor takes charge of a 14-year-old girl who may be humanity's last hope.",
       },
+      ,
+      {
+      name: "The Office (US)",
+      rating: 4,
+      picture: "https://roost.nbcuni.com/bin/viewasset.html/content/dam/Peacock/Landing-Pages/library/theoffice/mainpage/office-vertical-art.jpg/_jcr_content/renditions/original.JPEG",
+      description: "A mockumentary on a group of typical office workers, where the workday consists of ego clashes, inappropriate behavior, and tedium."
+      },
+      {
+        name: "The Walking Dead",
+        rating: 3,
+        picture: "https://m.media-amazon.com/images/M/MV5BZmU5NTcwNjktODIwMi00ZmZkLTk4ZWUtYzVjZWQ5ZTZjN2RlXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_UY1200_CR83,0,630,1200_AL_.jpg",
+        description: "Sheriff's deputy Rick Grimes awakens from a coma to find a post-apocalyptic world dominated by flesh-eating zombies."
+        },
+        {
+          name: "The Crown",
+          rating: 3,
+          picture: "https://m.media-amazon.com/images/I/71f97nf-u9L.jpg",
+          description: "Follows the political rivalries and romance of Queen Elizabeth II's reign and the events that shaped the second half of the 20th century."
+          },
+          {
+          name: "Stranger Things",
+          rating: 4,
+          picture: "https://resizing.flixster.com/0xxuABVVuzJrUT130WFHKE-irEg=/ems.cHJkLWVtcy1hc3NldHMvdHZzZWFzb24vNzUyMTFhOTktZTU4Ni00ODkyLWJlYjQtZTgxYTllZmU2OGM0LmpwZw==",
+          description: "When a young boy disappears, his mother, a police chief, and his friends must confront terrifying supernatural forces in order to get him back."
+          },
+          {
+          name: "The Big Bang Theory",
+          rating: 5,
+          picture: "https://www.tvguide.com/a/img/catalog/provider/1/1/1-6482810627.jpg",
+          description: "A woman who moves into an apartment across the hall from two brilliant but socially awkward physicists shows them how little they know about life outside of the laboratory."
+          }
     ]);
   }
   function HandleOurPicks() {}
