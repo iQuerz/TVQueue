@@ -184,16 +184,14 @@ function MediaCarousel(props) {
   function HandleUpcoming() {}
   function HandleRecentlyViewed() {}
     return (
-        <header className="media-carousel-header">
-            <nav>
-                <Button onClick={HandleLatestMovies}>Latest movies</Button>
-                <Button onClick={HandleLatestShows}>Latest shows</Button>
-                <Button onClick={HandleOurPicks}>Our picks</Button>
-                <Button onClick={HandleTrending}>Trending</Button>
-                <Button onClick={HandleUpcoming}>Upcoming</Button>
-                <Button onClick={HandleRecentlyViewed}>Recently Viewed</Button>
-            </nav>
-        </header>
+        <Box className="media-carousel-header">
+            <Button onClick={HandleLatestMovies}>Latest movies</Button>
+            <Button onClick={HandleLatestShows}>Latest shows</Button>
+            <Button onClick={HandleOurPicks}>Our picks</Button>
+            <Button onClick={HandleTrending}>Trending</Button>
+            <Button onClick={HandleUpcoming}>Upcoming</Button>
+            <Button onClick={HandleRecentlyViewed}>Recently Viewed</Button>
+        </Box>
     );
 }
 export default MediaCarousel;
