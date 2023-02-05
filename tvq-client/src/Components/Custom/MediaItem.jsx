@@ -14,10 +14,10 @@ function MediaItem(props) {
     const [hover, setHover] = useState(false);
 
     return (
-        <Card className={props.className} sx={{ minWidth:"12em", width:"12em", height:"25em" }}
+        <Card className={props.className} sx={{ minWidth:"12em", width:"12em", height:"23em" }}
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}>
-            <Box className="flex-down" sx={{justifyContent:"space-between"}}>
+            <Box className="flex-down" sx={{justifyContent:"space-between", height:"100%"}}>
                 <CardActionArea>
                     <CardMedia
                         sx={{ height: "15em" }}

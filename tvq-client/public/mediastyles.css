@@ -3,17 +3,29 @@
     overflow: auto!important;
     white-space: nowrap!important;
 }
-
 .media-list-element{
     display: inline-block;
     margin: 0.5em;
     white-space: normal!important;
 }
 
-.media-carousel-container{
-    width: var(--ui-width);
-}
 
 .media-carousel-header{
     width: var(--ui-width);
+    margin-top: 3em;
+}
+
+
+.media-grid-container{
+    margin: 3em;
+    margin-top: 0;
+    width: var(--ui-width);
+    overflow: auto!important;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start; /*ili center?*/
+}
+.media-grid-element{
+    margin: 0.5em;
 }

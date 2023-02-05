@@ -6,16 +6,15 @@ import { Box } from "@mui/system";
 import { useState } from "react";
 import MediaItem from "./MediaItem";
 
-function MediaList(props) {
+function MediaGrid(props) {
     const [hover, setHover] = useState(false);
 
     return (
-        <Box height={"40vh"} margin={"3em"}>
-            <Typography variant="h4">Featured:</Typography>
-            <Card className="media-list-container" variant="outlined" sx={{ width:"70vw", backgroundColor:"transparent"}}>
+        <Box maxHeight={"60vh"}>
+            <Card className="media-grid-container" variant="outlined" sx={{maxHeight:"60vh", width:"70vw", backgroundColor:"transparent"}}>
                 {
                     props.media.map((media, index) =>{
-                        return <MediaItem className="media-list-element" key={index} media={media}/>
+                        return <MediaItem className="media-grid-element" key={index} media={media}/>
                     })
                 } 
             </Card>
@@ -23,4 +22,4 @@ function MediaList(props) {
     );
 }
 
-export default MediaList;
+export default MediaGrid;
