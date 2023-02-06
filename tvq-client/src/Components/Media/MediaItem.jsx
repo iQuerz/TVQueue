@@ -47,7 +47,7 @@ function MediaItem(props) {
         <Card className={props.className} sx={{ minWidth:"12em", width:"12em", height:"23em" }}
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}>
-            <Box className="flex-down" sx={{justifyContent:"space-between", height:"100%"}}>
+            <Box className="flex-down" sx={{justifyContent:"space-between", height:"100%", flexGrow:"0", flexShrink:"0"}}>
 
                 <CardActionArea>
                     <CardMedia
@@ -57,8 +57,8 @@ function MediaItem(props) {
                     />
                 </CardActionArea>
 
-                <CardContent height="3.5em">
-                    <Typography variant="h6" component="div">
+                <CardContent sx={{minHeight:0, minWidth:0}}>
+                    <Typography className="clickable-link" variant="h6" height={"3em"} onClick={showMore}>
                         {props.media.name}
                     </Typography>
                 </CardContent>
