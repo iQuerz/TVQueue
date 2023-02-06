@@ -6,7 +6,6 @@ const _media = require("../services/mediaService");
 const _tag = require("../services/tagService");
 
 
-
 router.route("/top-:num_text-tags").get(_tag.aliasTopTags, _tag.getAllTags)
 
 module.exports = router;

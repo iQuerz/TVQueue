@@ -28,12 +28,16 @@ tagSchema.index(
 )
 
 //Pre middleware
+tagSchema.pre("save", function(next) { 
+    if(!this.name) next(new Error(_msg.requiredTagName))
+    next()
+})
 
 //Post middleware
 tagSchema.post("save", function(error, doc, next) {
     if (error.keyValue.name && error.code === 11000)
         next(new Error(_msg.existTagName))
-    else 
+    else
         next(error)
 })
 

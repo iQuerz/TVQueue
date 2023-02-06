@@ -7,7 +7,7 @@ const _mw = require("../helpers/middlewares")
 //Tags
 router.route("/")
     .get(_tag.getAllTags)
-    .post(_mw.checker.isBodyEmpty, _tag.createTag)
+    .post(_tag.createTag)
 
 router.route("/:tagId")
     .get(_tag.getTag)

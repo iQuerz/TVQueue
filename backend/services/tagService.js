@@ -64,7 +64,7 @@ const deleteTag = asyncHandler(async (req, res) => {
     const tagId = req.params.tagId
 
     const exist = await _tagContext.exists({ _id: tagId })
-    if(!exist) _mw.error.send(res, _code.notFound, _msg.tagNotFound)
+    if (!exist) _mw.error.send(res, _code.notFound, _msg.tagNotFound)
 
     const deletedTag = await _tagContext.findByIdAndDelete({ _id: tagId })
     
@@ -186,7 +186,10 @@ const deleteCustomMediaInTag = asyncHandler(async (req, res) => {
 
 //#endregion
 //==============================================================================================================================================//
-//#region Alias
+//#region Alias middleware
+
+//MIDDLEWARE: "/top-_num_text_-tags"
+//Description: Vrati top tagove "five" - "ten" - "fifteen"
 const aliasTopTags = asyncHandler(async (req, res, next) => {
     switch(req.params.num_text) {
         case "five":
@@ -207,6 +210,7 @@ const aliasTopTags = asyncHandler(async (req, res, next) => {
     req.query.skip = 0
     next()
 })
+
 //#endregion
 //==============================================================================================================================================//
 

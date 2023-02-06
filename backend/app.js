@@ -20,7 +20,9 @@ app.use("/api/accounts", require("./routes/accountRoute"))
 app.use("/api/media", require("./routes/mediaRoute"))
 app.use("/api/tags", require("./routes/tagRoute"))
 
-//Error
-app.use(_mw.error.handler)
+//Errors
+app.all("*", _mw.error.wrongUrlHandler)
+app.use(_mw.error.globalHandler)
 
+//Start server
 app.listen(_cfg.server.port, () => console.log(`Server started - localhost:${_cfg.server.port}`))
