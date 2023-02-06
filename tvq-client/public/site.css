@@ -158,3 +158,10 @@ header nav a {
 .media{
     height: 140,
 }
+
+.clickable-link{
+    cursor: pointer;
+}
+    .clickable-link:hover{
+        text-decoration: underline;
+    }
