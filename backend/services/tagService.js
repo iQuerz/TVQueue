@@ -13,12 +13,13 @@ const validator = { runValidators: true }
 //GET: "/api/tags?skip=_NUM_&limit=_NUM_" 
 //Description: Povlaci sve tagove
 const getAllTags = asyncHandler(async (req, res) => {
-    let allTagsQuery = _tagContext.find({}, { mediaEmbedded: 0})
+    let allTagsQuery = _tagContext.find({}, { _id: 1, name: 1 })
 
-    if (req.query.skip && req.query.limit)
+    if (!isNaN(req.query.skip) && req.query.limit) {
         allTagsQuery = allTagsQuery.skip(req.query.skip).limit(req.query.limit)
+    }
 
-    const allTags = await allTagsQuery.sort({ "mediaEmbedded": -1}).lean()
+    const allTags = await allTagsQuery.sort({ "mediaEmbedded": -1 }).lean()
 
     res.status(_code.ok).json(allTags)
 })
@@ -28,15 +29,15 @@ const getAllTags = asyncHandler(async (req, res) => {
 const createTag = asyncHandler(async (req, res) => {
     const { name } = req.body
 
-    if(!name) _mw.error.send(res, _code.badRequest, _msg.requiredName)
+    if(!name) _mw.error.send(res, _code.badRequest, _msg.requiredTagName)
 
     const createdTag = await _tagContext.create({ name })
 
-    res.status(_code.created).json(createdTag)
+    res.status(_code.created).json({ _id: createdTag._id, name: createdTag.name })
 })
 
 //GET: "/api/tags/:tagId?skip=_NUM_&limit=_NUM_"
-//Description: Povlaci tagove
+//Description: Povlaci tag
 const getTag = asyncHandler(async (req, res) => {
     const skip = parseInt((req.query.skip) ?? 0)
     const limit = parseInt((req.query.limit) ?? 10)
@@ -83,17 +84,16 @@ const filterCustomMediaInTag = asyncHandler(async (req, res) => {
     //Query setup
     let objQuery = { "$and": []}
 
-    if(type) objQuery["$and"].push({ "$eq": ["$$media.type", type] })
+    if(type) objQuery["$and"].push({ $eq: ["$$media.type", type] })
     if(name) objQuery["$and"].push({ $regexMatch: { input: "$$media.name", regex: name, options: "i" } })
 
-    fromDate = (fromDate) ? new Date(fromDate) : new Date("2019")
-    toDate = (toDate) ? new Date(toDate) : new Date("2024")
-    objQuery["$and"].push({ "$and": [{"$gte": ["$$media.airedDate", fromDate]}, {"$lte": ["$$media.airedDate", toDate]}] })
+    fromDate = (fromDate) ? new Date(fromDate) : new Date("1900")
+    toDate = (toDate) ? new Date(toDate) : new Date("2100")
+    objQuery["$and"].push({ $and: [{ $gte: ["$$media.airedDate", fromDate]}, { $lte: ["$$media.airedDate", toDate]}] })
 
     order = parseInt((order === "asc") ? 1 : -1)
     skip = parseInt((skip) ?? 0)
     limit = parseInt((limit) ?? 10)
-
 
     const { mediaEmbedded} = (await _tagContext.aggregate([
         { $match: { 
@@ -125,7 +125,7 @@ const filterCustomMediaInTag = asyncHandler(async (req, res) => {
             }
         },
     ], 
-    {$limit: 1}    
+    { $limit: 1 }    
     ))[0]
 
     res.status((mediaEmbedded.length) ? _code.ok : _code.noContent).json(mediaEmbedded)
@@ -186,6 +186,30 @@ const deleteCustomMediaInTag = asyncHandler(async (req, res) => {
 
 //#endregion
 //==============================================================================================================================================//
+//#region Alias
+const aliasTopTags = asyncHandler(async (req, res, next) => {
+    switch(req.params.num_text) {
+        case "five":
+            req.query.limit = 5
+            break
+        
+        case "ten":
+            req.query.limit = 10
+            break
+        
+        case "fifteen":
+            req.query.limit = 15
+            break
+    
+        default:
+            _mw.error.send(res, _code.forbidden, _msg.wrongUrl)
+    }
+    req.query.skip = 0
+    next()
+})
+//#endregion
+//==============================================================================================================================================//
+
 module.exports = {
     //Tags
     getAllTags,
@@ -198,5 +222,8 @@ module.exports = {
     filterCustomMediaInTag,
     addCustomMediaInTag,
     updateCustomMediaInTag,
-    deleteCustomMediaInTag
+    deleteCustomMediaInTag,
+
+    //Alias
+    aliasTopTags
 }

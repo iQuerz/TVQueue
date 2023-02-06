@@ -25,9 +25,6 @@ const tagSchema = new mongoose.Schema({
 //Indexes
 tagSchema.index(
     { "mediaEmbedded._id": 1 },
-    { "mediaEmbedded.type": 1 },
-    { "mediaEmbedded.rating": -1 },
-    { "mediaEmbedded.airedDate": -1 }
 )
 
 //Pre middleware
@@ -35,7 +32,7 @@ tagSchema.index(
 //Post middleware
 tagSchema.post("save", function(error, doc, next) {
     if (error.keyValue.name && error.code === 11000)
-        next(new Error(_msg.existName(error.keyValue.name)))
+        next(new Error(_msg.existTagName))
     else 
         next(error)
 })
