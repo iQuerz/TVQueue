@@ -13,7 +13,7 @@ const validator = { runValidators: true }
 //GET: "/api/tags?skip=_NUM_&limit=_NUM_" 
 //Description: Povlaci sve tagove
 const getAllTags = asyncHandler(async (req, res) => {
-    let allTagsQuery = _tagContext.find({}, { _id: 1, name: 1 })
+    let allTagsQuery = _tagContext.find({}, { _id: 1, name: 1, mediaCount: 1 })
 
     if (!isNaN(req.query.skip) && req.query.limit) {
         allTagsQuery = allTagsQuery.skip(req.query.skip).limit(req.query.limit)
@@ -43,7 +43,7 @@ const getTag = asyncHandler(async (req, res) => {
     const limit = parseInt((req.query.limit) ?? 10)
     const tagId = req.params.tagId
 
-    const tag = await _tagContext.findById({ _id: tagId }, { _id: 0, mediaEmbedded: { $slice: [skip, limit] }, name: 1}).lean()
+    const tag = await _tagContext.findById({ _id: tagId }, { _id: 0, mediaEmbedded: { $slice: [skip, limit] }, name: 1, mediaCount: 1}).lean()
 
     res.status((tag) ? _code.ok : _code.noContent).json(tag)
 })
@@ -53,6 +53,9 @@ const getTag = asyncHandler(async (req, res) => {
 const patchTag = asyncHandler(async (req, res) => {
     const tagId = req.params.tagId
     
+    if(req.body.mediaCount) _mw.error.send(res, _code.forbidden, _msg.forbiddenMediaCount)
+    if(req.body.mediaEmbedded.length > 0) _mw.error.send(res, _code.forbidden, _msg.forbiddenMediaEmbedded)
+
     const updatedTag = await _tagContext.findByIdAndUpdate({ _id: tagId }, req.body)
 
     res.status((updatedTag) ? _code.ok : _code.noContent).json(_msg.updatedTag)
@@ -64,7 +67,7 @@ const deleteTag = asyncHandler(async (req, res) => {
     const tagId = req.params.tagId
 
     const exist = await _tagContext.exists({ _id: tagId })
-    if (!exist) _mw.error.send(res, _code.notFound, _msg.tagNotFound)
+    if(!exist) _mw.error.send(res, _code.notFound, _msg.tagNotFound)
 
     const deletedTag = await _tagContext.findByIdAndDelete({ _id: tagId })
     
@@ -95,12 +98,13 @@ const filterCustomMediaInTag = asyncHandler(async (req, res) => {
     skip = parseInt((skip) ?? 0)
     limit = parseInt((limit) ?? 10)
 
-    const { mediaEmbedded} = (await _tagContext.aggregate([
+    const mediaList = (await _tagContext.aggregate([
         { $match: { 
             _id: tagId,
         }},
         { $project: {
             _id: 0,
+            mediaCount: 1,
             mediaEmbedded: { 
                 $filter: {
                     input: "$mediaEmbedded",
@@ -111,6 +115,7 @@ const filterCustomMediaInTag = asyncHandler(async (req, res) => {
         }},
         { $project: {
             _id: 0,
+            mediaCount: 1,
             mediaEmbedded: { 
                 $sortArray: {
                     input: "$mediaEmbedded",
@@ -121,6 +126,7 @@ const filterCustomMediaInTag = asyncHandler(async (req, res) => {
         },
         { $project: {
             _id: 0,
+            mediaCount: 1,
             mediaEmbedded: { $slice: ["$mediaEmbedded", skip, limit] }
             }
         },
@@ -128,7 +134,7 @@ const filterCustomMediaInTag = asyncHandler(async (req, res) => {
     { $limit: 1 }    
     ))[0]
 
-    res.status((mediaEmbedded.length) ? _code.ok : _code.noContent).json(mediaEmbedded)
+    res.status((mediaList.mediaEmbedded.length) ? _code.ok : _code.noContent).json(mediaList)
 })
 
 //POST: "/api/tags/:tagId/media" 
@@ -140,11 +146,11 @@ const addCustomMediaInTag = asyncHandler(async (req, res) => {
     const exist = await _tagContext.exists({ _id: tagId, "mediaEmbedded._id": customMedia._id})    
     if(exist) _mw.error.send(res, _code.badRequest, _msg.existCustomMediaInTag)
 
-    const result = await _tagContext.updateOne({ _id: tagId}, { $push: { mediaEmbedded: customMedia}}, validator)
+    const result = await _tagContext.updateOne({ _id: tagId }, { $push: { mediaEmbedded: customMedia}, $inc: { mediaCount: 1 }}, validator)
     
     if (result.modifiedCount === 0)
         _mw.error.send(res, _code.noContent, "")
-
+ 
     res.status(_code.created).json(_msg.addedMediaToTag)
 })
 
@@ -179,7 +185,7 @@ const deleteCustomMediaInTag = asyncHandler(async (req, res) => {
     const exist = await _tagContext.exists({ _id: tagId, "mediaEmbedded._id": mediaId})
     if(!exist) _mw.error.send(res, _code.notFound, _msg.mediaInTagNotFound)
 
-    await _tagContext.updateOne({ _id: tagId }, { $pull: { mediaEmbedded: { _id: mediaId }}})
+    await _tagContext.updateOne({ _id: tagId }, { $pull: { mediaEmbedded: { _id: mediaId }}, $inc: { mediaCount: -1 }})
 
     res.status(_code.ok).json(_msg.deletedMediaInTag)
 })

@@ -26,6 +26,9 @@ module.exports = {
     requiredTagName: "Tag name is required",  
 
     existTagName: "The tag name already exists",
-    existCustomMediaInTag: "Media that you tried to insert in the tag already exists",    
+    existCustomMediaInTag: "Media that you tried to insert in the tag already exists", 
     
+    forbiddenMediaCount: "Can't update media count manually",
+    forbiddenMediaEmbedded: "Media in the tag can only be set to empty array"
+ 
 }
