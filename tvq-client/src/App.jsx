@@ -6,6 +6,7 @@ import LoginPage from "./Pages/LoginPage";
 import MediaPage from './Pages/MediaPage';
 import ProfilePage from './Pages/ProfilePage';
 import RegisterPage from './Pages/RegisterPage';
+import SearchPage from './Pages/SearchPage';
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
                         <Route path="/Login" element={<LoginPage/>} />
                         <Route path="/Register" element={<RegisterPage />} />
                         <Route path="/Media" element={<MediaPage />} />
+                        <Route path="/Search" element={<SearchPage />} />
                     </Routes>
             </Router>
         </>

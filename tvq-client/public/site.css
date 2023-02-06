@@ -158,3 +158,26 @@ header nav a {
 .media{
     height: 140,
 }
+
+
+.sidebar {
+    position: absolute;
+    top: 72px; /* height of the navigation bar */
+    right: 0;
+    bottom: 0;
+    width: 200px;
+    background-color: #f2f2f2;
+    padding: 20px;
+  }
+.sidebar > * {
+    background-color: var(--orange)!important;
+    padding: 1em;
+    display: block;
+    color: var(--dark-blue)
+}
+  
+  .sidebar-nav-button {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+  }
