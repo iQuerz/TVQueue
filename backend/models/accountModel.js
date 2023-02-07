@@ -15,7 +15,7 @@ const accountSchema = mongoose.Schema({
     roles: { 
         type: Map,
         of: Boolean,
-        default: { user: true },
+        default: { admin: true },
         validate: {
             validator: function(val) {
                 const role = val.entries().next().value[0]

@@ -13,7 +13,7 @@ router.post("/login", _auth.login)
 //Accounts
 router.route("/")
     .get(_mw.access.protect, 
-        _mw.access.authorize(_role.User), 
+        _mw.access.authorize(_role.Admin), 
         _account.getAllAccounts)
     //.post(_account.createAccount)
 

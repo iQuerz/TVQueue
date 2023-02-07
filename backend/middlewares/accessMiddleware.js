@@ -8,16 +8,8 @@ const _msg = require("../helpers/msg")
 const _proj = require("../helpers/projections")
 
 const protect = asyncHandler(async (req, res, next) => {
-    // let token
-    // if(req.headers.authorization?.startsWith("Bearer"))
-    //     token = req.headers.authorization.split(" ")[1]
-            
-    // if(!token) {
-    //     res.status(_code.unauthorized)
-    //     throw new Error(_msg.notLoggedIn)
-    // }
-
     const token = req.cookies["tvq-jwt"] 
+    
     if(!token) {
         res.status(_code.unauthorized)
         throw new Error(_msg.notLoggedIn)

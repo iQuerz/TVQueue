@@ -66,7 +66,7 @@ const patchTag = asyncHandler(async (req, res) => {
     const tagId = req.params.tagId
     
     if(req.body.mediaCount) _mw.error.send(res, _code.forbidden, _msg.forbiddenMediaCount)
-    if(req.body.mediaEmbedded.length > 0) _mw.error.send(res, _code.forbidden, _msg.forbiddenMediaEmbedded)
+    if(req.body.mediaEmbedded?.length > 0) _mw.error.send(res, _code.forbidden, _msg.forbiddenMediaEmbedded)
 
     const updatedTag = await _tagContext.findByIdAndUpdate({ _id: tagId }, req.body)
 
