@@ -7,6 +7,8 @@ function MediaCarousel(props) {
 
     //kada uctiamo sajt da se otvori prvi izbor
     useEffect(()=>{
+        let selectedElement = document.querySelector(".media-carousel-header .carousel-selected")
+        setSelectedEl(selectedElement);
         HandleLatestMovies();
     },[])
     function HandleLatestMovies(event) {
@@ -193,9 +195,9 @@ function MediaCarousel(props) {
     }
     return (
         <Box className="media-carousel-header">
-            <Button className="carousel-selected" onClick={(event) => { HandleLatestMovies(event); handleSelect(event); } }>Latest movies</Button>
-            <Button onClick={(event) => { HandleLatestShows(event); handleSelect(event); } }>Latest shows</Button>
-            <Button onClick={(event) => { HandleOurPicks(event); handleSelect(event); } }>Our picks</Button>
+            <Button onClick={(event) => { HandleLatestMovies(); handleSelect(event); } } className="carousel-selected">Latest movies</Button>
+            <Button onClick={(event) => { HandleLatestShows(); handleSelect(event); } }>Latest shows</Button>
+            <Button onClick={(event) => { HandleOurPicks(); handleSelect(event); } }>Our picks</Button>
             <Button onClick={(event) => { HandleTrending(); handleSelect(event); } }>Trending</Button>
             <Button onClick={(event) => { HandleUpcoming(); handleSelect(event); } }>Upcoming</Button>
             <Button onClick={(event) => { HandleRecentlyViewed() ;handleSelect(event); } }>Recently Viewed</Button>
