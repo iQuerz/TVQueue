@@ -1,17 +1,19 @@
 import { Card,Box,Paper,Typography, Avatar, Button } from "@mui/material";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRef } from "react";
 import TagBubble from "../Components/Custom/TagBubble";
 
 
 function MediaPage() {
     const mediaID = useRef();
+
     useEffect(()=>{
-        mediaID.current = window.localStorage.getItem('pickedMedia');
+        //setMedia(JSON.parse(localStorage.getItem('pickedMedia')));
+        //prebacio sam u state, ne bi se
         //fetch u media posle
     },[])
 
-    const media = useRef(
+    const [media, setMedia] = useState(
         {
             name: "Shrek",
             picture: "https://m.media-amazon.com/images/M/MV5BOGZhM2FhNTItODAzNi00YjA0LWEyN2UtNjJlYWQzYzU1MDg5L2ltYWdlL2ltYWdlXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_FMjpg_UX1000_.jpg",
@@ -27,53 +29,66 @@ function MediaPage() {
     return (
         <Box className="flex-down" marginTop={"1em"}>
             <Box className="flex-right" width={"var(--ui-width)"}>
-                <img src={media.current.picture} className="media-image"></img>
+                <img src={media.picture} className="media-image"></img>
                 <Box className="flex-down" marginLeft={"1em"}>
-                    <Typography variant="h2">{media.current.name} ({media.current.date.substring(0,4)})</Typography>
-                    <Typography variant="h4">{media.current.rating}/10</Typography>
+                    <Typography variant="h2">{media.name} ({media.date ? media.date.substring(0,4) : ""})</Typography>
+                    <Typography variant="h4">{media.rating ? media.rating+"/10" : "no rating"}</Typography>
                     <Box className="flex-right" sx={{flexWrap:"wrap"}}>
-                        {
-                            media.current.tags.map((tag, index) =>{
+                        {media.tags?
+                            media.tags.map((tag, index) =>{
                                 return (<TagBubble tag={tag} key={index}></TagBubble>);
                             })
+                            :""
                         }
                     </Box>
                 </Box>
             </Box>
 
-            <Box className="media-section">
-                <Typography variant="h6">{media.current.description}</Typography>
-            </Box>
+            {media.description ?
+                <Box className="media-section">
+                    <Typography variant="h6">{media.description}</Typography>
+                </Box>
+                :""
+            }
 
-            <Typography variant="h5" className="media-section">Directors: &nbsp;
-                {
-                    media.current.directors.map((director,index) => {
-                            if(index<media.current.directors.length-1){
-                                return (director + ", ")
+            {media.directors?
+                <Typography variant="h5" className="media-section">Directors: &nbsp;
+                    {
+                        media.directors.map((director,index) => {
+                                if(index<media.directors.length-1){
+                                    return (director + ", ")
+                                }
+                                return(director)
                             }
-                            return(director)
-                        }
-                    )
-                }
-            </Typography>
+                        )
+                    }
+                </Typography>
+                :""
+            }
 
-            <Box className="media-section">
-                <Typography width={"100%"} variant="h4">Cast:</Typography>
-                {
-                    media.current.actors.map((actor,index) => {
-                        return(<Typography variant="h6" key={index}>{actor}</Typography>)
-                    })
-                }
-            </Box>
+            {media.actors?
+                <Box className="media-section">
+                    <Typography width={"100%"} variant="h4">Cast:</Typography>
+                    {
+                        media.actors.map((actor,index) => {
+                            return(<Typography variant="h6" key={index}>{actor}</Typography>)
+                        })
+                    }
+                </Box>
+                :""
+            }
 
-            <Box className="media-section">
-                <Typography width={"100%"} variant="h4">Reviews: <Button variant="contained" size="large">Add Yours</Button></Typography>
-                {
-                    media.current.reviews.map((review,index) => {
-                        return(<Typography variant="h6" key={index}>{review.value}, "{review.comment}"</Typography>)
-                    })
-                }
-            </Box>
+            {media.reviews?
+                <Box className="media-section">
+                    <Typography width={"100%"} variant="h4">Reviews: <Button variant="contained" size="large">Add Yours</Button></Typography>
+                    {
+                        media.reviews.map((review,index) => {
+                            return(<Typography variant="h6" key={index}>{review.value}, "{review.comment}"</Typography>)
+                        })
+                    }
+                </Box>
+                :""
+            }
         </Box>
     );
 }

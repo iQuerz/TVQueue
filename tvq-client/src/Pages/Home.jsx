@@ -12,15 +12,13 @@ function HomePage() {
     function handleDisplayMediaChange(media){
         setDisplayMedia(media);
     }
-
-    console.log(displayMedia)
-  return (
-    <Box className="flex-down">
-        <MediaCarousel media={displayMedia} onChange={handleDisplayMediaChange}/>
-        <MediaGrid media={displayMedia}></MediaGrid>
-        <MediaList title={"Featured"} media={displayMedia}></MediaList>
-    </Box>
-  );
+    return (
+        <Box className="flex-down">
+            <MediaCarousel media={displayMedia} onChange={handleDisplayMediaChange}/>
+            <MediaGrid media={displayMedia}></MediaGrid>
+            <MediaList title={"Featured"} media={displayMedia}></MediaList>
+        </Box>
+    );
 }
 
 export default HomePage;
