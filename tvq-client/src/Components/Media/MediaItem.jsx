@@ -29,7 +29,7 @@ function MediaItem(props) {
     const navigate = useNavigate();
     function showMore(){
         //ovde cemo i guess u local storage da stavimo media koju je izabrao i na onaj sajt cemo da fethujemo podatke o njemu i guess
-        window.localStorage.setItem('pickedMedia', props.media.name) //bice id 
+        localStorage.setItem('pickedMedia', JSON.stringify(props.media)) //bice id 
         navigate("/media")
     }
     function addToWatchlist(){
@@ -57,14 +57,14 @@ function MediaItem(props) {
                     />
                 </CardActionArea>
 
-                <CardContent sx={{minHeight:0, minWidth:0}}>
-                    <Typography className="clickable-link" variant="h6" height={"3em"} onClick={showMore}>
+                <CardContent>
+                    <Typography className="clickable-link" variant="h6" height={"3em"} onClick={showMore} overflow={"hidden"} title={props.media.name}>
                         {props.media.name}
                     </Typography>
                 </CardContent>
 
                 <Box className="flex-down" height={"4.5em"}>
-                    <Rating name="read-only" value={props.media.rating} readOnly/>
+                    <Rating name="read-only" value={props.media.rating} title={props.media.rating} readOnly/>
                     <CardActions className="flex-right">         
                         <Button onClick={showMore} size="medium">More</Button>
                         <Button size="medium" onClick={handleOpenMenu}>Add to</Button>

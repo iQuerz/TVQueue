@@ -26,6 +26,10 @@
     .media-carousel-header button:hover{
         background-color: var(--dark-blue-hover);
     }
+.carousel-selected{
+    border-bottom: 5px solid var(--orange)!important;
+
+}
 
 
 .media-grid-container{
@@ -45,7 +49,6 @@
 
 .media-image{
     height: 50vh;
-
 }
 
 .media-section{
