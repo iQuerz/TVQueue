@@ -46,7 +46,7 @@ tagSchema.post("save", function(error, doc, next) {
         next(error)
 })
 
-//Helper functions
+//Methods
 
 //Final step
 module.exports = mongoose.model("Tag", tagSchema)

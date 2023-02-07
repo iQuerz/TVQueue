@@ -1,13 +1,28 @@
 module.exports = {
     //Generic 
     unknownError: "Unknown error",
-    wrongUrl: "The link you've tried to access doesn't exist",
     requiredBody: "Body is required for this method",
-
+    wrongUrl: "The link you've tried to access doesn't exist",
+    noPermissions: "You don't have permission for this action",
+    
     //Account
-    requireAccountId: "Account ID is required",
+    createdAccount: "Account has been created",
+
+    requiredAccountId: "Account ID is required",
+    requiredAccountEmail: "Account email is required",
     requiredAccountName: "Account name is required", 
-    requiredAccountPassword: "Password is required",
+    requiredAccountPassword: "Account password is required",
+
+    registeredAccount: "Account has been registered",
+    loggedInAccount: "Logged in",
+
+    notLoggedIn: "You are not logged in",
+
+    wrongPassword: "Wrong password entered",
+    wrongEmail: "Wrong email entered",
+    wrongToken: "Wrong token given",
+
+    invalidEmail: "You've entered invalid email",
 
     //Media
 
@@ -29,6 +44,6 @@ module.exports = {
     existCustomMediaInTag: "Media that you tried to insert in the tag already exists", 
     
     forbiddenMediaCount: "Can't update media count manually",
-    forbiddenMediaEmbedded: "Media in the tag can only be set to empty array"
+    forbiddenMediaEmbedded: "Media list in the tag can only be set to empty array"
  
 }

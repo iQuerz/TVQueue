@@ -1,9 +1,9 @@
-const auth = require("../middlewares/authMiddleware")
+const access = require("../middlewares/accessMiddleware")
 const checker = require("../middlewares/checkerMiddleware")
 const error = require("../middlewares/errorMiddleware")
 
 module.exports = {
-    auth,
+    access,
     checker,
     error
 }

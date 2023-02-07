@@ -1,5 +1,6 @@
 //Require
 const express = require("express")
+const cookieParser = require("cookie-parser")
 
 const _cfg = require("./helpers/configs")
 const _mw = require("./helpers/middlewares")
@@ -12,6 +13,7 @@ const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(express.static("./public")) //localhost:port/images/{folder_name}/{image_name}
+app.use(cookieParser())
 
 //Routes
 app.use("/", require("./routes/aliasRoute"))
