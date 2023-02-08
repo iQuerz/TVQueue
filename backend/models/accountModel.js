@@ -29,7 +29,7 @@ const accountSchema = mongoose.Schema({
         },
     },
     playlists: [{
-        name: { type: String, enum: [_enum.playlists.WatchLater, _enum.playlists.Watched, _enum.playlists.Watching] },
+        name: { type: String, enum: [_enum.playlists.watchLater, _enum.playlists.watched, _enum.playlists.watching] },
         mediaRefs: { type: mongoose.Types.ObjectId, ref: "Media" }
         // media-Generic-Info
     }],
