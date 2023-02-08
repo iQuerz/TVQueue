@@ -1,19 +1,31 @@
 module.exports = {
-    //Account
-    account: {
-        getId_Name_Roles: { _id: 1, name: 1, roles: 1 },
-        getId_Name_Picture_Roles: { _id: 1, name: 1, picture: 1, roles: 1 }
-    },
+    //Project
+    result: {},
+    default: 1,
+    get __v() { this.result.__v = 0; return this },
 
-    //Media
-    media: {
-        getIdNamePictureRoles: { _id: 1, name: 1, picture: 1, roles: 1 }
-    },
 
-    //Tag
-    tag: {
-        getId_Name_MediaCount: { _id: 1, name: 1, mediaCount: 1 },
-        getName_MediaCountMedia_MediaEmbedded: (skip, limit) => { return { _id: 0, mediaEmbedded: { $slice: [skip, limit] }, name: 1, mediaCount: 1 } }
+    get one() { this.default = 1; return this },
+    get zero() { this.default = 0; return this },
+    get neg() { this.default = -1; return this },
+
+    get Id() { this.result._id = this.default; return this },
+    get Name() { this.result.name = this.default; return this },
+    get Email() { this.result.email = this.default; return this },
+    get Roles() { this.result.roles = this.default; return this },
+    get Picture() { this.result.picture = this.default; return this },
+    get Reviews() { this.result.picture = this.default; return this },
+    get Playlists() { this.result.playlists = this.default; return this },
+    get MediaCount() { this.result.mediaCount = this.default; return this },
+    get FollowingTags() { this.result.followingTags = this.default; return this },
+
+
+
+
+    //Functions
+    MediaEmbedded: function(skip, limit) { 
+        this.result.mediaEmbedded = (!skip) ? this.default : {$slice: [skip, limit]}
+        return this
     },
 
     //Filter

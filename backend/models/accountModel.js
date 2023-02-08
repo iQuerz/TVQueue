@@ -4,26 +4,39 @@ const validator = require("validator")
 const _security = require("../configs/security")
 const _code = require("../helpers/statusCodes")
 const _msg = require("../helpers/msg")
-const _role = require("../helpers/roles")
+const _enum = require("../helpers/enums")
 
 //Schema definition
 const accountSchema = mongoose.Schema({
     email: { type: String, required: [true, _msg.requiredAccountEmail], unique: true, lowercase: true, validate: [validator.isEmail, _msg.invalidEmail] },
     name: { type: String, required: [true, _msg.requiredAccountName] },
     password: { type: String, required: [true, _msg.requiredAccountPassword], select: false, minLength: 3 },
-    picture: { type: String, default: "/avatars/chick.jpg" },
+    picture: { type: String },
     roles: { 
         type: Map,
         of: Boolean,
-        default: { admin: true },
+        default: { admin: true, user: true },
         validate: {
             validator: function(val) {
-                const role = val.entries().next().value[0]
-                return Object.values(_role).includes(role)
+                let valide = true
+                val.forEach((value, role) => {
+                    if(!Object.values(_enum.roles).includes(role))
+                        valide = false
+                })
+                return valide
             },
-            message: `Allowed types: ${Object.values(_role)}`
+            message: `Allowed types: ${Object.values(_enum.roles)}`
         }
-    }
+    },
+    playlists: [{
+        name: { type: String, enum: [_enum.playlists.WatchLater, _enum.playlists.Watched, _enum.playlists.Watching] },
+        media: { type: mongoose.Types.ObjectId, ref: "Media" }
+    }],
+    reviews: [{
+        rating: Number,
+        media: { type: mongoose.Types.ObjectId, ref: "Media" }
+    }],
+    followingTags: [{ type: mongoose.Types.ObjectId, ref: "Tag"}]
 },
 {
     timestamps: true
@@ -46,6 +59,26 @@ accountSchema.pre("save", async function(next) {
     }
     next()    
 })
+
+accountSchema.pre("findOneAndUpdate", async function(next) {
+    const { _id } = this.getQuery()
+    const update = this.getUpdate()
+    console.log(update)
+    if(update.password) {
+        const salt = await _security.bcrypt.genSalt(_security.bcryptSaltRounds)
+        update.password = await _security.bcrypt.hash(update.password, salt)
+    }
+
+    if(update.playlists) throw new Error(_msg.forbiddenPlaylist)
+    if(update.reviews) throw new Error(_msg.forbiddenReviews)
+    if(update.followingTags) throw new Error(_msg.forbiddenFollowingTags)
+
+    next()    
+})
+
+
+
+
 
 //Post middleware
 

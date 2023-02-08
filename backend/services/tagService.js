@@ -17,7 +17,7 @@ const validator = { runValidators: true }
 //@Roles
 //@Description: Povlaci sve tagove
 const getAllTags = asyncHandler(async (req, res) => {
-    let allTagsQuery = _tagContext.find({}, _obj.tag.getId_Name_MediaCount)
+    let allTagsQuery = _tagContext.find({}, _obj.one.Id.Name.MediaCount.result)
     const skip = parseInt((req.query.skip) ?? 0)
     const limit = parseInt((req.query.limit) ?? 10)
 
@@ -25,7 +25,7 @@ const getAllTags = asyncHandler(async (req, res) => {
         allTagsQuery = allTagsQuery.skip(skip).limit(limit)
     }
 
-    const allTags = await allTagsQuery.sort({ "mediaEmbedded": -1 }).lean()
+    const allTags = await allTagsQuery.sort({ mediaCount: -1 }).lean()
 
     res.status(_code.ok).json(allTags)
 })
@@ -53,7 +53,7 @@ const getTag = asyncHandler(async (req, res) => {
     const limit = parseInt((req.query.limit) ?? 10)
     const tagId = req.params.tagId
 
-    const tag = await _tagContext.findById({ _id: tagId }, _obj.tag.getName_MediaCountMedia_MediaEmbedded(skip, limit)).lean()
+    const tag = await _tagContext.findById({ _id: tagId }, _obj.one.Name.MediaCount.MediaEmbedded(skip, limit).result).lean()
 
     res.status((tag) ? _code.ok : _code.noContent).json(tag)
 })
@@ -214,7 +214,7 @@ const deleteCustomMediaInTag = asyncHandler(async (req, res) => {
 
 //#endregion
 //==============================================================================================================================================//
-//#region Alias middleware
+//#region Tags Alias
 
 //@MIDDLEWARE: "/top-_num_text_-tags"
 //@Access: PUBLIC
@@ -258,6 +258,6 @@ module.exports = {
     updateCustomMediaInTag,
     deleteCustomMediaInTag,
 
-    //Alias
+    //Tags Alias
     aliasTopTags
 }
