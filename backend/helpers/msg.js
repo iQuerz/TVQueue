@@ -7,11 +7,18 @@ module.exports = {
     
     //Account
     createdAccount: "Account has been created",
+    updatedAccount: "Successfully updated the account",
+    deletedAccount: "Successfully deleted the account",
+
+    accountNotFound: "Account not found",   
 
     requiredAccountId: "Account ID is required",
     requiredAccountEmail: "Account email is required",
     requiredAccountName: "Account name is required", 
     requiredAccountPassword: "Account password is required",
+    
+    accountTagsNotFound: "Account tags not found",
+    existAccountTag: "Account tag exists",
 
     registeredAccount: "Account has been registered",
     loggedInAccount: "Logged in",
@@ -21,9 +28,17 @@ module.exports = {
     wrongPassword: "Wrong password entered",
     wrongEmail: "Wrong email entered",
     wrongToken: "Wrong token given",
+    wrongIdNameTag: "You didn't enter name or id for the tag",
 
     invalidEmail: "You've entered invalid email",
 
+    forbiddenPlaylist: "Playlist list can't be modified through patch method",
+    forbiddenReviews: "Review list can't be modified through patch method",
+    forbiddenFollowingTags: "Tags list can't be modified through patch method",
+
+    updatedAccountTag: "Account tag name has been updated",
+    updatedAccountTagFailed: "Account tag name has been updated",
+    
     //Media
 
     //Tag
