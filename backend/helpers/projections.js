@@ -29,11 +29,7 @@ module.exports = {
     },
 
     //Filter
-    filterBody: (obj, ...args) => {
-        const newObj = {}
-        Object.keys(obj).forEach(el => {
-            if (args.includes(el)) newObj[el] = obj[el]
-        })
-        return newObj
+    filter: (obj, ...args) => {
+        return Object.fromEntries(Object.entries(obj).filter(([field, value]) => (args.includes(field) && value != null)));
     }
 }

@@ -6,8 +6,8 @@ const _code = require("../helpers/statusCodes")
 const _msg = require("../helpers/msg")
 const _mw = require("../helpers/middlewares")
 const _obj = require("../helpers/projections")
+const _enum = require("../helpers/enums")
 const _security = require("../configs/security")
-const { update } = require("../models/accountModel")
 
 const validator = { runValidators: true }
 //==============================================================================================================================================//
@@ -18,25 +18,34 @@ const validator = { runValidators: true }
 //@Roles: ADMIN
 //@Description: Povlaci sve account-ove
 const getAllAccounts = asyncHandler( async (req, res) => {
-    const skip = parseInt((req.query.skip) ?? 0)
-    const limit = parseInt((req.query.limit) ?? 10)
+    // const query = _obj.filter(req.query, "text", "roles", "skip", "limit")
+
+    // query.skip = parseInt((query.skip) ?? 0)
+    // query.limit = parseInt((query.limit) ?? 10)
     
-    let allAccountsQuery = _accountContext.find({}, _obj.one.Id.Name.Picture.Roles.FollowingTags.result)
+    // if(query.roles) {
+    //     // if
+    //     query.roles = (query.roles instanceof Array) ? query.roles.map(role => (role in _enum.roles) ? { role: true } : undefined)
+    // }
+    //$or: [{"roles.director": true}, {"roles.actor": true}]}
+    
+    // let allAccountsQuery = _accountContext.find({}, _obj.one.Id.Name.Picture.Roles.FollowingTags.result)
 
-    if (!isNaN(req.query.skip) && req.query.limit)
-        allAccountsQuery = allAccountsQuery.skip(skip).limit(limit)
+    // if (!isNaN(req.query.skip) && req.query.limit)
+    //     allAccountsQuery = allAccountsQuery.skip(skip).limit(limit)
 
-    const allAccounts = await allAccountsQuery.populate("followingTags", "name").lean()
-
-    res.status(_code.ok).json(allAccounts)
+    // const allAccounts = await allAccountsQuery.lean()
+    // console.log(query)
+    // res.status(_code.ok).json(query)
 })
 
-//@POST: "/api/account" 
+//@POST: "/api/accounts" 
 //@Access: PROTECTED
 //@Roles: ADMIN
 //@Description: Koristi se za kreiranje fake naloga (actor i director)
 const createAccount = asyncHandler(async (req, res) => {
-    const account = _obj.filterBody(req.body, "name", "picture", "roles")
+    const account = _obj.filter(req.body, "email", "name", "picture", "roles")
+    console.log(account)
     account.email = `${Number(new Date).toString(36).slice(-6)}@email.com`
     account.password = Number(new Date).toString(35).slice(-5);
 
@@ -45,14 +54,14 @@ const createAccount = asyncHandler(async (req, res) => {
     res.status(_code.created).json(account)
 })
 
-//@GET: "/api/account/:accountId"
+//@GET: "/api/accounts/:accountId"
 //@Access: PUBLIC
 //@Roles: ALL
 //@Description: Povlaci account
 const getAccount = asyncHandler(async (req, res) => {
     const accountId = req.params.accountId
 
-    const account = await _accountContext.findById({ _id: accountId }, _obj.one.Id.Name.Email.Picture.FollowingTags.result).populate("followingTags", "name").lean()
+    const account = await _accountContext.findOne({ _id: accountId }, _obj.one.Id.Name.Email.Picture.FollowingTags.result).lean()
 
     res.status((account) ? _code.ok : _code.noContent).json(account)
 })
@@ -63,9 +72,13 @@ const getAccount = asyncHandler(async (req, res) => {
 //@Description: Updateuje samo deo prosledjen u body
 const patchAccount = asyncHandler(async (req, res) => {
     const accountId = req.params.accountId
- 
-    const updatedAccount = await _accountContext.findByIdAndUpdate({ _id: accountId }, req.body)
 
+    if(req.body.playlists) throw new Error(_msg.forbiddenPlaylist)
+    if(req.body.reviews) throw new Error(_msg.forbiddenReviews)
+    if(req.body.followingTags) throw new Error(_msg.forbiddenFollowingTags)
+ 
+    const updatedAccount = await _accountContext.findByIdAndUpdate({ _id: accountId }, req.body, { new: true })
+    
     res.status((updatedAccount) ? _code.ok : _code.noContent).json(_msg.updatedAccount)
 })
 
@@ -88,30 +101,49 @@ const deleteAccount = asyncHandler(async (req, res) => {
 //==============================================================================================================================================//
 //#region Accounts + Tags
 
-//@POST: "/api/account/_ACCOUNT_ID_/tags" 
+//@POST: "/api/accounts/_ACCOUNT_ID_/tags" 
 //@Access: PROTECTED
 //@Roles: ADMIN
 //@Description: Dodaje listu tagova [tags] u account
 const addFollowingTags = asyncHandler( async (req, res) => {
     const accountId = req.params.accountId
     const newTags = req.body
+    const newTagsId = newTags.map(e => e._id)
 
-    const addedTags = await _accountContext.findOneAndUpdate({ _id: accountId, followingTags: { $nin: newTags }}, { $push: { followingTags: newTags }}, { new: true })
+    const addedTags = await _accountContext.findOneAndUpdate({ _id: accountId, "followingTag._id": { $nin: newTagsId }}, { $push: { followingTags: newTags }}, { new: true })
 
     res.status((addedTags) ? _code.ok : _code.badRequest).json(addedTags ?? _msg.existAccountTag)
 })
 
-//@DELETE: "/api/account/_ACCOUNT_ID_/tags" 
+//@DELETE: "/api/accounts/_ACCOUNT_ID_/tags" 
 //@Access: PROTECTED
 //@Roles: ADMIN
-//@Description: Dodaje listu tagova [tags] u account
+//@Description: Brise listu tagova [tags] u account
 const removeFollowingTags = asyncHandler( async (req, res) => {
     const accountId = req.params.accountId
-    const removeTag = req.body
+    const removeTags = req.body
+    const removeTagsId = removeTags.map(e => e._id)
+    console.log(removeTagsId)
+    const removedTags = await _accountContext.findOneAndUpdate({ _id: accountId }, { $pull: { "followingTags": { _id: { $in: removeTagsId }}}}, { new: true })
 
-    const removedTag = await _accountContext.findOneAndUpdate({ _id: accountId }, { $pullAll: { followingTags: removeTag }}, { new: true })
+    res.status((removedTags) ? _code.ok : _code.badRequest).json(removedTags ?? _msg.accountTagsNotFound)
+})
 
-    res.status((removedTag) ? _code.ok : _code.badRequest).json(removedTag ?? _msg.existAccountTag)
+//@PATCH: "/api/accounts/:tagId/media/:mediaId" 
+//@Access: PROTECTED
+//@Roles: ADMIN
+//@Description: Koristi se za updatovanje taga kad se update-uje sam tag dokument
+const updateFollowingTag = asyncHandler(async (req, res) => {
+    const accountId = req.params.accountId
+    const tag = req.body
+
+    if (!tag._id || !tag.name) _mw.error.send(res, _code.badRequest, _msg.wrongIdNameTag)
+
+    const result = await _accountContext.updateOne({ _id: accountId, "followingTags._id": tag._id }, { $set: { "followingTags.$.name": tag.name }})
+    
+    if (result.modifiedCount === 0) _mw.error.send(res, _code.notFound, _msg.updatedAccountTagFailed)
+
+    res.status(_code.ok).json(_msg.updatedAccountTag)
 })
 
 //#endregion
@@ -127,9 +159,9 @@ const removeFollowingTags = asyncHandler( async (req, res) => {
 //==============================================================================================================================================//
 //#region Accounts + Me
 
-//@GET: "/api/account/me"
+//@MIDDLEWARE: "/api/account/me"
 //@Access: PROTECTED
-//@Roles
+//@Roles: Users
 //@Description: Povlaci account
 const getMe = (req, res, next) => {
     req.params.accountId = req.myAccount._id
@@ -154,6 +186,7 @@ module.exports = {
     //Accounts + Tags
     addFollowingTags,
     removeFollowingTags,
+    updateFollowingTag,
 
     //Accounts + Playlists
 

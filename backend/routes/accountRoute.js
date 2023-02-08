@@ -33,6 +33,7 @@ router.route("/:accountId")
 //Accounts + Tags
 router.route("/:accountId/tags")
     .post(_account.addFollowingTags)
+    .patch(_account.updateFollowingTag)
     .delete(_account.removeFollowingTags)
 
 

@@ -1,6 +1,7 @@
 //Require
 const express = require("express")
 const cookieParser = require("cookie-parser")
+const cors = require("cors")
 
 const _cfg = require("./helpers/configs")
 const _mw = require("./helpers/middlewares")
@@ -11,6 +12,7 @@ _cfg.mongo.connectDB();
 const app = express()
 
 //Setup middleware
+app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(express.static("./public")) //localhost:port/images/{folder_name}/{image_name}

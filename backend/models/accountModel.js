@@ -20,32 +20,39 @@ const accountSchema = mongoose.Schema({
             validator: function(val) {
                 let valide = true
                 val.forEach((value, role) => {
-                    if(!Object.values(_enum.roles).includes(role))
+                    if(!(role in _enum.roles))
                         valide = false
                 })
                 return valide
             },
             message: `Allowed types: ${Object.values(_enum.roles)}`
-        }
+        },
     },
     playlists: [{
         name: { type: String, enum: [_enum.playlists.WatchLater, _enum.playlists.Watched, _enum.playlists.Watching] },
-        media: { type: mongoose.Types.ObjectId, ref: "Media" }
+        mediaRefs: { type: mongoose.Types.ObjectId, ref: "Media" }
+        // media-Generic-Info
     }],
     reviews: [{
         rating: Number,
         media: { type: mongoose.Types.ObjectId, ref: "Media" }
     }],
-    followingTags: [{ type: mongoose.Types.ObjectId, ref: "Tag"}]
+    followingTags: [{ 
+        _id: mongoose.Types.ObjectId,
+        name: String
+    }]
 },
 {
     timestamps: true
 })
 
 //Indexes
-accountSchema.index(
-    { "email": 1 }
-)
+accountSchema.index({ "email": 1 })
+accountSchema.index({"roles.user": 1}, {sparse: true})
+accountSchema.index({"roles.admin": 1}, {sparse: true})
+accountSchema.index({"roles.actor": 1}, {sparse: true})
+accountSchema.index({"roles.director": 1}, {sparse: true})
+
 
 //Virtuals
 
@@ -63,22 +70,14 @@ accountSchema.pre("save", async function(next) {
 accountSchema.pre("findOneAndUpdate", async function(next) {
     const { _id } = this.getQuery()
     const update = this.getUpdate()
-    console.log(update)
+
     if(update.password) {
         const salt = await _security.bcrypt.genSalt(_security.bcryptSaltRounds)
         update.password = await _security.bcrypt.hash(update.password, salt)
     }
 
-    if(update.playlists) throw new Error(_msg.forbiddenPlaylist)
-    if(update.reviews) throw new Error(_msg.forbiddenReviews)
-    if(update.followingTags) throw new Error(_msg.forbiddenFollowingTags)
-
     next()    
 })
-
-
-
-
 
 //Post middleware
 

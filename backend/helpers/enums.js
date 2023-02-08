@@ -2,27 +2,27 @@
 module.exports = {
     
     roles: {
-        User: "user",
-        Admin: "admin",
-        Actor: "actor",
-        Director: "director"
+        user: "User",
+        admin: "Admin",
+        actor: "Actor",
+        director: "Director"
     },
 
     media: {
-        Movie: "Movie",
-        TvShow: "TV Show",
-        Episode: "Episode"
+        movie: "Movie",
+        tvShow: "TV Show",
+        episode: "Episode"
     },
 
     staticTags: {
-        Trending: "Trending",
-        Featured: "Featured",
-        OurPicks: "Our Picks"
+        trending: "Trending",
+        featured: "Featured",
+        ourPicks: "Our Picks"
     },
 
     playlists: {
-        Watched: "watched",
-        Watching: "watching",
-        WatchLater: "watchlater"
+        watched: true,
+        watching: true,
+        watchLater: true
     }
 }
