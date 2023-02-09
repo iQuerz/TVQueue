@@ -26,7 +26,8 @@ const getAllAccounts = asyncHandler( async (req, res) => {
 
     if (query.roles) {
         if(!(query.roles instanceof Array)) query.roles = [query.roles]
-            query.roles = query.roles.filter(roleValid => _enum.roles.type[roleValid.toLowerCase()]).map(role => ({ [role.toLowerCase()]: true  }) )
+        
+        query.roles = query.roles.filter(roleValid => _enum.roles.type[roleValid.toLowerCase()]).map(role => ({ [role.toLowerCase()]: true  }) )
         
         if (query.roles.length > 0) ({ "$or": query.roles }) 
         else delete query.roles

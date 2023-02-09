@@ -22,7 +22,7 @@ module.exports = {
 
     registeredAccount: "Account has been registered",
     loggedInAccount: "Logged in",
-
+    loggedOutAccount: "You have been logged out",
     notLoggedIn: "You are not logged in",
 
     wrongPassword: "Wrong password entered",
