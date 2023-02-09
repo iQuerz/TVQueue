@@ -19,7 +19,7 @@ const validator = { runValidators: true }
 //@Description: Povlaci sve tagove
 const getAllTags = asyncHandler(async (req, res) => {
     const tagName = (req.query.name) ? new RegExp("^" + req.query.name?.replace("+", " ") + "$", "i") : {$nin: _enum.toKeyList(_enum.staticTags)}
-    console.log(tagName)
+
     const skip = parseInt((req.query.skip) ?? 0)
     const limit = parseInt((req.query.limit) ?? 10)
 

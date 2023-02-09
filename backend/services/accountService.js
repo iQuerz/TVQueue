@@ -14,37 +14,33 @@ const validator = { runValidators: true }
 //==============================================================================================================================================//
 //#region Accounts
 
-//@GET: "/api/account?skip=_NUM_&limit=_NUM_" 
+//@GET: "/api/accounts?skip=_NUM_&limit=_NUM_&name=_TXT_&email=_TXT_&roles=admin&roles=user...""
 //@Access: PROTECTED
 //@Roles: ADMIN
 //@Description: Povlaci sve account-ove
 const getAllAccounts = asyncHandler( async (req, res) => {
-    const query = _obj.filter(req.query, "text", "roles", "skip", "limit")
+    const skip = parseInt((req.query.skip) ?? 0)
+    const limit = parseInt((req.query.limit) ?? 10)
 
-    query.skip = parseInt((query.skip) ?? 0)
-    query.limit = parseInt((query.limit) ?? 10)
+    const obj = _obj.filter(req.query, "name", "email", "roles")
+    let query = (Object.keys(obj).length === 0) ? {} : {"$or": []}
 
-    if (query.roles) {
-        if(!(query.roles instanceof Array)) query.roles = [query.roles]
+    if (obj.name) query["$or"].push({"name": {$regex: obj.name, $options: "i"}})
+    if (obj.email) query["$or"].push({"email": {$regex: obj.email, $options: "i"}})
+
+    if(obj.roles) {
+        if(!(obj.roles instanceof Array)) obj.roles = [obj.roles]
+
+        const roles = obj.roles.filter(roleValid => _enum.roles.type[roleValid.toLowerCase()]).map(role => ({ [`roles.${[role.toLowerCase()]}`]: true  }) )
+
+        query["$and"] = roles
         
-        query.roles = query.roles.filter(roleValid => _enum.roles.type[roleValid.toLowerCase()]).map(role => ({ [role.toLowerCase()]: true  }) )
-        
-        if (query.roles.length > 0) ({ "$or": query.roles }) 
-        else delete query.roles
+        if(query["$or"]) query = { "$and": [ {$or: query["$or"]}, {$and: query["$and"]} ] }
     }
-    
-    console.log(query)
 
-        // $or: [{"roles.director": true}, {"roles.actor": true}]}
-      
-    // let allAccountsQuery = _accountContext.find({}, _obj.one.Id.Name.Picture.Roles.FollowingTags.result)
+    const allAccountsQuery = await _accountContext.find(query, _obj.one.Id.Email.Name.Picture.Roles.FollowingTags.result).skip(skip).limit(limit).lean()
 
-    // if (!isNaN(req.query.skip) && req.query.limit)
-    //     allAccountsQuery = allAccountsQuery.skip(skip).limit(limit)
-
-    // // const allAccounts = await allAccountsQuery.lean()
-    console.log(query)
-    res.status(_code.ok).json(query)
+    res.status(_code.ok).json(allAccountsQuery)
 })
 
 //@POST: "/api/accounts" 

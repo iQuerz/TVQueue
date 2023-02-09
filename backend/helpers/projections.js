@@ -19,9 +19,6 @@ module.exports = {
     get MediaCount() { this.result.mediaCount = this.default; return this },
     get FollowingTags() { this.result.followingTags = this.default; return this },
 
-
-
-
     //Functions
     MediaEmbedded: function(skip, limit) { 
         console.log(skip + " " + limit)
