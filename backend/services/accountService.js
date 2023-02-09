@@ -39,9 +39,9 @@ const getAllAccounts = asyncHandler( async (req, res) => {
     // if (!isNaN(req.query.skip) && req.query.limit)
     //     allAccountsQuery = allAccountsQuery.skip(skip).limit(limit)
 
-    // const allAccounts = await allAccountsQuery.lean()
-    console.log(query)
-    res.status(_code.ok).json(query)
+    // // const allAccounts = await allAccountsQuery.lean()
+    // console.log(query)
+    // res.status(_code.ok).json(query)
 })
 
 //@POST: "/api/accounts" 
