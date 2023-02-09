@@ -1,3 +1,4 @@
+const mongoose = require("mongoose")
 const asyncHandler = require("express-async-handler")
 
 const _accountContext = require("../models/accountModel")
@@ -18,19 +19,20 @@ const validator = { runValidators: true }
 //@Roles: ADMIN
 //@Description: Povlaci sve account-ove
 const getAllAccounts = asyncHandler( async (req, res) => {
-    // const query = _obj.filter(req.query, "text", "roles", "skip", "limit")
+    const query = _obj.filter(req.query, "text", "roles", "skip", "limit")
 
-    // query.skip = parseInt((query.skip) ?? 0)
-    // query.limit = parseInt((query.limit) ?? 10)
-    // console.log(query)
+    query.skip = parseInt((query.skip) ?? 0)
+    query.limit = parseInt((query.limit) ?? 10)
 
-    // const test = query.roles
-
-    // if(query.roles)
-    //     if (query.roles instanceof Array) 
-    //         query.roles = query.roles.filter(roleValid => _enum.roles[roleValid]).map(role => ({ role: true  }) )
-    //     else 
-    //         query.roles= { test: true }
+    if (query.roles) {
+        if(!(query.roles instanceof Array)) query.roles = [query.roles]
+            query.roles = query.roles.filter(roleValid => _enum.roles.type[roleValid.toLowerCase()]).map(role => ({ [role.toLowerCase()]: true  }) )
+        
+        if (query.roles.length > 0) ({ "$or": query.roles }) 
+        else delete query.roles
+    }
+    
+    console.log(query)
 
         // $or: [{"roles.director": true}, {"roles.actor": true}]}
       
@@ -40,8 +42,8 @@ const getAllAccounts = asyncHandler( async (req, res) => {
     //     allAccountsQuery = allAccountsQuery.skip(skip).limit(limit)
 
     // // const allAccounts = await allAccountsQuery.lean()
-    // console.log(query)
-    // res.status(_code.ok).json(query)
+    console.log(query)
+    res.status(_code.ok).json(query)
 })
 
 //@POST: "/api/accounts" 
@@ -50,12 +52,13 @@ const getAllAccounts = asyncHandler( async (req, res) => {
 //@Description: Koristi se za kreiranje fake naloga (actor i director)
 const createAccount = asyncHandler(async (req, res) => {
     const account = _obj.filter(req.body, "email", "name", "picture", "roles")
-    console.log(account)
+
+    account._id = mongoose.Types.ObjectId();
     account.email = `${Number(new Date).toString(36).slice(-6)}@email.com`
     account.password = Number(new Date).toString(35).slice(-5);
 
     const createdAccount = await _accountContext.create(account)
-
+    
     res.status(_code.created).json(account)
 })
 

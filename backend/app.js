@@ -5,7 +5,6 @@ const cors = require("cors")
 
 const _cfg = require("./helpers/configs")
 const _mw = require("./helpers/middlewares")
-const _obj = require("./helpers/projections")
 
 //Setup main
 _cfg.mongo.connectDB();

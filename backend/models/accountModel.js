@@ -18,18 +18,17 @@ const accountSchema = mongoose.Schema({
         default: { admin: true, user: true },
         validate: {
             validator: function(val) {
-                let valide = true
                 val.forEach((value, role) => {
-                    if(!_enum.roles[role])
-                        valide = false
+                    if(!_enum.roles.type[role])
+                        return false
                 })
-                return valide
+                return true
             },
-            message: `Allowed types: ${Object.values(_enum.roles)}`
+            message: `Allowed types: ${_enum.toValueList(_enum.roles)}`
         },
     },
     playlists: [{
-        name: { type: String, enum: [_enum.playlists.watchLater, _enum.playlists.watched, _enum.playlists.watching] },
+        name: { type: String, enum: _enum.toKeyList(_enum.playlists) },
         mediaRefs: { type: mongoose.Types.ObjectId, ref: "Media" }
         // media-Generic-Info
     }],

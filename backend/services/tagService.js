@@ -7,21 +7,25 @@ const _code = require("../helpers/statusCodes")
 const _msg = require("../helpers/msg")
 const _mw = require("../helpers/middlewares")
 const _obj = require("../helpers/projections")
+const _enum = require("../helpers/enums")
 
 const validator = { runValidators: true }
 //==============================================================================================================================================//
 //#region Tags
 
-//@GET: "/api/tags?skip=_NUM_&limit=_NUM_" 
+//@GET: "/api/tags?skip=_NUM_&limit=_NUM_&name=_TXT_" 
 //@Access: PUBLIC
 //@Roles
 //@Description: Povlaci sve tagove
 const getAllTags = asyncHandler(async (req, res) => {
-    let allTagsQuery = _tagContext.find({}, _obj.one.Id.Name.MediaCount.result)
+    const tagName = (req.query.name) ? new RegExp("^" + req.query.name?.replace("+", " ") + "$", "i") : {$nin: _enum.toKeyList(_enum.staticTags)}
+    console.log(tagName)
     const skip = parseInt((req.query.skip) ?? 0)
     const limit = parseInt((req.query.limit) ?? 10)
 
-    if (!isNaN(req.query.skip) && req.query.limit) {
+    let allTagsQuery = _tagContext.find({ name: tagName }, _obj.one.Id.Name.MediaCount.result)
+
+    if (!isNaN(req.query.skip) && !isNaN(req.query.limit)) {
         allTagsQuery = allTagsQuery.skip(skip).limit(limit)
     }
 

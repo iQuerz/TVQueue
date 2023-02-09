@@ -24,7 +24,8 @@ module.exports = {
 
     //Functions
     MediaEmbedded: function(skip, limit) { 
-        this.result.mediaEmbedded = (!skip) ? this.default : {$slice: [skip, limit]}
+        console.log(skip + " " + limit)
+        this.result.mediaEmbedded = (limit) ? {$slice: [skip, limit]} : this.default
         return this
     },
 
