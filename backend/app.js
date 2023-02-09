@@ -12,7 +12,7 @@ _cfg.mongo.connectDB();
 const app = express()
 
 //Setup middleware
-app.use(cors())
+app.use(cors(_cfg.server.corsOptions))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(express.static("./public")) //localhost:port/images/{folder_name}/{image_name}

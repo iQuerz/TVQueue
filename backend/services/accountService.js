@@ -22,21 +22,26 @@ const getAllAccounts = asyncHandler( async (req, res) => {
 
     // query.skip = parseInt((query.skip) ?? 0)
     // query.limit = parseInt((query.limit) ?? 10)
-    
-    // if(query.roles) {
-    //     // if
-    //     query.roles = (query.roles instanceof Array) ? query.roles.map(role => (role in _enum.roles) ? { role: true } : undefined)
-    // }
-    //$or: [{"roles.director": true}, {"roles.actor": true}]}
-    
+    // console.log(query)
+
+    // const test = query.roles
+
+    // if(query.roles)
+    //     if (query.roles instanceof Array) 
+    //         query.roles = query.roles.filter(roleValid => _enum.roles[roleValid]).map(role => ({ role: true  }) )
+    //     else 
+    //         query.roles= { test: true }
+
+        // $or: [{"roles.director": true}, {"roles.actor": true}]}
+      
     // let allAccountsQuery = _accountContext.find({}, _obj.one.Id.Name.Picture.Roles.FollowingTags.result)
 
     // if (!isNaN(req.query.skip) && req.query.limit)
     //     allAccountsQuery = allAccountsQuery.skip(skip).limit(limit)
 
     // const allAccounts = await allAccountsQuery.lean()
-    // console.log(query)
-    // res.status(_code.ok).json(query)
+    console.log(query)
+    res.status(_code.ok).json(query)
 })
 
 //@POST: "/api/accounts" 

@@ -20,7 +20,7 @@ const accountSchema = mongoose.Schema({
             validator: function(val) {
                 let valide = true
                 val.forEach((value, role) => {
-                    if(!(role in _enum.roles))
+                    if(!_enum.roles[role])
                         valide = false
                 })
                 return valide
