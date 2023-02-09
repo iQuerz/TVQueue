@@ -1,28 +1,41 @@
 //Not really enums but whatever... moongose doesn't work with Symbol
 module.exports = {
-    
+
     roles: {
-        user: "User",
-        admin: "Admin",
-        actor: "Actor",
-        director: "Director"
+        type: {
+            user: "User",
+            admin: "Admin",
+            actor: "Actor",
+            director: "Director"
+        },
     },
 
     media: {
-        movie: "Movie",
-        tvShow: "TV Show",
-        episode: "Episode"
+        type: {
+            movie: "Movie",
+            tvshow: "TV Show",
+            episode: "Episode"
+        },
     },
 
     staticTags: {
-        trending: "Trending",
-        featured: "Featured",
-        ourPicks: "Our Picks"
+        type: {
+            trending: "Trending",
+            featured: "Featured",
+            ourpicks: "Our Picks"
+        },
     },
 
     playlists: {
-        watched: true,
-        watching: true,
-        watchLater: true
-    }
+        type: {
+            watched: "Watched",
+            watching: "Watching",
+            watchlater: "Watch Later"
+        },
+    },
+
+    //Functions
+    toKeyList: function(e) { return Object.keys(e.type) },
+    toValueList: function(e) { return Object.values(e.type) }
+    
 }
