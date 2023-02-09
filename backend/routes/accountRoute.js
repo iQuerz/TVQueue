@@ -9,6 +9,7 @@ const _enum = require("../helpers/enums")
 //Login + Register
 router.post("/register", _auth.register)
 router.post("/login", _auth.login)
+router.get("/logout", _auth.logout)
 
 //Accounts + Me
 router.route("/me")
