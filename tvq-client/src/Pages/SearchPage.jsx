@@ -1,23 +1,34 @@
 import { Button, TextField } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import SelectComponent from "../Components/Custom/SelectComponent";
 import MediaGrid from "../Components/Media/MediaGrid";
 import SideBar from "../Components/Search/Sidebar";
-
+import Utility from "../Utility";
 function SearchPage() {
   const [selectedTag, setSelectedTag] = useState("");
   const [displayMedia, setDisplayMedia] = useState([]);
+  const filterOptions = useRef([{name :"Any"},{name :"Tv Show"},{name:"Movie"}]);
   const [hardCodedDataSwap, setHardCodedDataSwap] = useState(true);
+  const [filter,setFilter] = useState("Any");
   const searchString = useRef();
   useEffect(() => {
     fetchTag();
   }, [selectedTag]);
   function handleSelectedTagChange(tag) {
     setSelectedTag(tag);
-    console.log(selectedTag);
+  }
+  function fetchTag(){
+    if(selectedTag._id){
+        Utility.fetchData("http://localhost:3000/api/tags/"+selectedTag._id)
+        .then(data => {
+          setDisplayMedia(data.mediaEmbedded)
+        })
+        .catch(error => console.error(error));
+      }
   }
   //kada bude bilo mozemo actual tag da fetchujemo
-  function fetchTag() {
+  function fetchTag2() {
     //fetthc(selectedTag)
     if (hardCodedDataSwap) {
       setDisplayMedia([
@@ -221,9 +232,17 @@ function SearchPage() {
           "Nine noble families fight for control over the mythical lands of Westeros, while a forgotten race returns after being dormant for thousands of years.",
       }]);
   }
+  function handleFilterChange(event){
+    setFilter(event);
+  }
   return (
     <>
       <TextField label="Search" variant="outlined" inputRef={searchString}></TextField>
+      <SelectComponent
+      label={"Filter"}
+      options={filterOptions.current}
+      onChange={handleFilterChange}
+      />
       <Button onClick={fetchSerac}>Serach</Button>
       <SideBar onChange={handleSelectedTagChange}></SideBar>
       <MediaGrid media={displayMedia}></MediaGrid>

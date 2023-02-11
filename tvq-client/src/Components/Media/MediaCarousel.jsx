@@ -1,15 +1,17 @@
 import { Button } from "@mui/material";
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
+import Utility from "../../Utility";
 
 function MediaCarousel(props) {
-    const [selectedEl, setSelectedEl] = useState(null);
+    const [selectedEl, setSelectedEl] = useState("");
+    const [carouselOptions, setCarouselOptions] = useState([]);
 
     //kada uctiamo sajt da se otvori prvi izbor
     useEffect(()=>{
+        getAllTags()
         let selectedElement = document.querySelector(".media-carousel-header .carousel-selected")
         setSelectedEl(selectedElement);
-        HandleLatestMovies();
     },[])
     function HandleLatestMovies(event) {
         props.onChange([
@@ -185,7 +187,6 @@ function MediaCarousel(props) {
     function HandleOurPicks(event) {}
     function HandleTrending(event) {}
     function HandleUpcoming(event) {}
-    function HandleRecentlyViewed(event) {}
 
     function handleSelect(event){
         if(selectedEl)
@@ -193,14 +194,28 @@ function MediaCarousel(props) {
         setSelectedEl(event.target)
         event.target.classList.add("carousel-selected")
     }
+    function getAllTags(){
+        Utility.fetchData("http://localhost:3000/api/tags")
+        .then(data => {
+            setCarouselOptions(data)
+            fetchTag(data[0]._id)
+        })
+        .catch(error => console.error(error));
+    }
+    function fetchTag(id){
+        if(id){
+            Utility.fetchData("http://localhost:3000/api/tags/"+id)
+            .then(data => {
+              props.onChange(data.mediaEmbedded)
+            })
+            .catch(error => console.error(error));
+          }
+      }
     return (
         <Box className="media-carousel-header">
-            <Button onClick={(event) => { HandleLatestMovies(); handleSelect(event); } } className="carousel-selected">Latest movies</Button>
-            <Button onClick={(event) => { HandleLatestShows(); handleSelect(event); } }>Latest shows</Button>
-            <Button onClick={(event) => { HandleOurPicks(); handleSelect(event); } }>Our picks</Button>
-            <Button onClick={(event) => { HandleTrending(); handleSelect(event); } }>Trending</Button>
-            <Button onClick={(event) => { HandleUpcoming(); handleSelect(event); } }>Upcoming</Button>
-            <Button onClick={(event) => { HandleRecentlyViewed() ;handleSelect(event); } }>Recently Viewed</Button>
+            {carouselOptions.map((option,index)=>{
+                return <Button className={index == 0 ? "carousel-selected" : ""} key={index} onClick={(event) => { fetchTag(option._id); handleSelect(event); } }>{option.name}</Button>
+            })}
         </Box>
     );
 }

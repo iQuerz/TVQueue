@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import RegisterForm from "../Components/Login/RegisterForm";
 import { useState, useRef } from "react";
 import { useEffect } from "react";
+import Utility from "../Utility";
 
 function RegisterPage() {
     const email = useRef();
@@ -19,11 +20,19 @@ function RegisterPage() {
         setPicture(event.target.value)
     }
     function tryRegister(){
-        console.log(email.current.value);
-        console.log(password.current.value);
-        console.log(confirmPassword.current.value);
-        console.log(name.current.value);
-        console.log(picture);
+        const user = {
+            email: email.current.value,
+            name: name.current.value,
+            picture: picture,
+            password: password.current.value
+        }
+        console.log(user)
+        Utility.fetchData("http://localhost:3000/api/accounts/register", "POST", user)
+        .then(data => {
+            if(data)
+                navigate("/login");
+        })
+        .catch(error => console.error(error));
     }
     function handleFetchSuccess(){
         navigate('/')

@@ -9,10 +9,12 @@ import {
     Rating,
     Menu,
     MenuItem,
+    getFabUtilityClass,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useState } from "react";
 import {useNavigate } from "react-router-dom";
+import Utility from "../../Utility";
 
 function MediaItem(props) {
     const [hover, setHover] = useState(false);
@@ -32,14 +34,40 @@ function MediaItem(props) {
         localStorage.setItem('pickedMedia', JSON.stringify(props.media)) //bice id 
         navigate("/media")
     }
+    //body za svaki idem pojedinacno
+    const body = {
+        _id: props.media._id,
+        name: props.media.name,
+        picture: props.media.picture
+    }
     function addToWatchlist(){
-        alert("not implemented yet")
+        console.log(body)
+        Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watchlater","POST",body)
+        .then(data => {
+            if(data.status == 400)
+            alert("This media is already in one of your playlists")
+            if(data.status == 403)
+                navigate("/login")
+        })
+
     }
     function addToCurrentlyWatching(){
-        alert("not implemented yet")
+        Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watching","POST",body)
+        .then(data => {
+            if(data.status == 400)
+            alert("This media is already in one of your playlists")
+            if(data.status == 403)
+                navigate("/login")
+        })
     }
     function addToWatched(){
-        alert("not implemented yet")
+        Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watched","POST",body)
+        .then(data => {
+            if(data.status == 400)
+            alert("This media is already in one of your playlists")
+        if(data.status == 403)
+            navigate("/login")
+        })
     }
 
 
@@ -53,13 +81,13 @@ function MediaItem(props) {
                     <CardMedia
                         sx={{ height: "15em" }}
                         title={props.media.name}
-                        image={props.media.picture}
+                        image={props.media.picture ? props.media.picture : props.media.mediaPicture}
                     />
                 </CardActionArea>
 
                 <CardContent>
                     <Typography className="clickable-link" variant="h6" height={"3em"} onClick={showMore} overflow={"hidden"} title={props.media.name}>
-                        {props.media.name}
+                        {props.media.name ? props.media.name : props.media.mediaName}
                     </Typography>
                 </CardContent>
 
