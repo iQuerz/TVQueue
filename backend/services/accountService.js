@@ -179,10 +179,8 @@ const getAllPlaylists = asyncHandler( async (req, res) => {
             media: { $slice: ["$media", limit] }
         }},
     ])
-    
-    res.status(_code.ok).json(result)
 
-    // res.status((success) ? _code.ok : _code.badRequest).json(success ? _msg.success : _msg.failed)
+    res.status(_code.ok).json(result)
 })
 
 //@POST: "/api/accounts/_ACCOUNT_ID_/playlists/_PLAYLIST_NAME_"

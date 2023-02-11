@@ -20,12 +20,13 @@ const validator = { runValidators: true }
 //@Roles
 //@Description: Povlaci sve tagove
 const getAllTags = asyncHandler(async (req, res) => {
-    const tagName = (req.query.name) ? new RegExp("^" + req.query.name?.replace("+", " ") + "$", "i") : {$nin: _enum.toKeyList(_enum.staticTags)}
+    const type = req.params.static ?? {}
+    const obj = (req.query.name) ? { name: new RegExp("^" + req.query.name?.replace("+", " ") + "$", "i") } : type
 
     const skip = parseInt((req.query.skip) ?? 0)
     const limit = parseInt((req.query.limit) ?? 10)
 
-    let allTagsQuery = _tagContext.find({ name: tagName }, _obj.one.Id.Name.MediaCount.result)
+    let allTagsQuery = _tagContext.find(obj, _obj.one.Id.Name.MediaCount.result)
 
     if (!isNaN(req.query.skip) && !isNaN(req.query.limit)) {
         allTagsQuery = allTagsQuery.skip(skip).limit(limit)
@@ -255,6 +256,24 @@ const aliasTopTags = asyncHandler(async (req, res, next) => {
     next()
 })
 
+//@MIDDLEWARE: "/static"
+//@Access: PUBLIC
+//@Roles
+//@Description: Vrati top tagove "five" - "ten" - "fifteen"
+const aliasStaticTags = asyncHandler(async (req, res, next) => {
+    req.params.static = { name: {$in: _enum.toKeyList(_enum.staticTags)} }
+    next()
+})
+
+//@MIDDLEWARE: "/genres"
+//@Access: PUBLIC
+//@Roles
+//@Description: Vrati top tagove "five" - "ten" - "fifteen"
+const aliasGenreTags = asyncHandler(async (req, res, next) => {
+    req.params.static = { name: {$nin: _enum.toKeyList(_enum.staticTags)} }
+    next()
+})
+
 //#endregion
 //==============================================================================================================================================//
 
@@ -273,5 +292,7 @@ module.exports = {
     deleteCustomMediaInTag,
 
     //Tags Alias
-    aliasTopTags
+    aliasTopTags,
+    aliasStaticTags,
+    aliasGenreTags
 }

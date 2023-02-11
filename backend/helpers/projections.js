@@ -26,6 +26,8 @@ module.exports = {
     get Rating() { this.result.rating = this.default; return this },
     get ReviewCount() { this.result.reviewCount = this.default; return this },
     get Parent() { this.result.reviewCount = this.default; return this },
+    get Trendiness() { this.result.trendiness = this.default; return this },
+
 
 
     //Tag
@@ -53,6 +55,10 @@ module.exports = {
 
     Tags: function(skip, limit) { 
         return this.funcSlice("tags", skip, limit)
+    },
+
+    Episodes: function(skip, limit) { 
+        return this.funcSlice("episodes", skip, limit)
     },
 
 
