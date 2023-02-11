@@ -9,16 +9,17 @@ import Utility from "../Utility";
 function MediaPage() {
     const mediaID = useRef();
     const [seasions,setSeasions] = useState([]);
-    const [selectedSeasion, setSelectedSeasion] = useState("")
+    const [selectedSeasion, setSelectedSeasion] = useState({name:"Season-1"})
     function handleSelectedSeasionChange(event){
         setSelectedSeasion(event)
     }
+     const [rerender,setRerender] = useState(0);
     useEffect(()=>{
         //setMedia(JSON.parse(localStorage.getItem('pickedMedia')));
         mediaID.current = localStorage.getItem('pickedMedia');
         console.log(mediaID.current)
         fetchMedia();
-    },[])
+    },[rerender])
 
     function fetchMedia(){
         Utility.fetchData("http://localhost:3000/api/media/"+mediaID.current)
@@ -29,7 +30,7 @@ function MediaPage() {
                 {
                     const seasonNumbers = data.episodes.map(episode => parseInt(episode.seasonEpisode.split("#")[1].split("-")[0]));
                     const maxSeasonNumber = Math.max(...seasonNumbers);
-                    const seasons = Array.from({ length: maxSeasonNumber }, (_, index) => ({ name: `Season ${index + 1}` }));
+                    const seasons = Array.from({ length: maxSeasonNumber }, (_, index) => ({ name: `Season-${index + 1}` }));
                     console.log(seasons)
                     setSeasions(seasons);
                 }
@@ -53,7 +54,11 @@ function MediaPage() {
             <Box className="flex-right" width={"var(--ui-width)"}>
                 <img src={media.picture} className="media-image"></img>
                 <Box className="flex-down" marginLeft={"1em"}>
-                    <Typography variant="h2">{media.name} ({media.airedDate ? media.airedDate.substring(0,4) : ""})</Typography>
+                    {media.parent ? <Typography onClick={()=>{
+                        localStorage.setItem('pickedMedia', media.parent._id)
+                        setRerender(rerender+1)
+                    }} className="clickable-link" variant="h2"> {"Show : " + media.parent.name} </Typography> : ""}
+                    <Typography variant="h3">{media.name} ({media.airedDate ? media.airedDate.substring(0,4) : ""})</Typography>
                     <Typography variant="h4">{media.rating ? media.rating+"/10" : "no rating"}</Typography>
                     <Box className="flex-right" sx={{flexWrap:"wrap"}}>
                         {media.tags?
@@ -81,8 +86,14 @@ function MediaPage() {
                         />
                     <Box>
                         {media.episodes.map((episode,index)=>{
-                            // if(selectedSeasion == parseInt(episode.sessionEpisode.split("#")[1].split("-")[0]))
-                             return(<Typography key={index}> {episode.name + episode.seasonEpisode}</Typography>)
+                            return selectedSeasion.name.split("-")[1] ==  parseInt(episode.seasonEpisode.split("#")[1].split("-")[0])
+                            ?
+                            (<Button onClick={()=>{
+                                localStorage.setItem('pickedMedia', episode._id)
+                                setRerender(rerender+1)
+                            }} key={index}> {episode.name + episode.seasonEpisode}</Button>) 
+                            : 
+                            ""
                         })}
                     </Box>
                 </Box>

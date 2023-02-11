@@ -46,17 +46,27 @@ function MediaItem(props) {
         Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watchlater","POST",body)
         .then(data => {
             if(data.status == 400)
-            alert("This media is already in one of your playlists")
+            {
+                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watchlater/" + props.media._id,"DELETE")
+                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watching/" + props.media._id,"DELETE")
+                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watched/" + props.media._id,"DELETE")
+                .then(Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watchlater","POST",body))
+            }
             if(data.status == 403)
                 navigate("/login")
         })
-
     }
     function addToCurrentlyWatching(){
         Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watching","POST",body)
         .then(data => {
             if(data.status == 400)
-            alert("This media is already in one of your playlists")
+            {
+                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watchlater/" + props.media._id,"DELETE")
+                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watching/" + props.media._id,"DELETE")
+                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watched/" + props.media._id,"DELETE")
+                .then(Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watching","POST",body))
+                
+            }
             if(data.status == 403)
                 navigate("/login")
         })
@@ -65,7 +75,12 @@ function MediaItem(props) {
         Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watched","POST",body)
         .then(data => {
             if(data.status == 400)
-            alert("This media is already in one of your playlists")
+            {
+                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watchlater/" + props.media._id,"DELETE")
+                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watching/" + props.media._id,"DELETE")
+                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watched/" + props.media._id,"DELETE")
+                .then(Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watched","POST",body))
+            }
         if(data.status == 403)
             navigate("/login")
         })
