@@ -9,7 +9,7 @@ const _enum = require("../helpers/enums")
 //Schema definition
 const accountSchema = mongoose.Schema({
     email: { type: String, required: [true, _msg.requiredAccountEmail], unique: true, lowercase: true, validate: [validator.isEmail, _msg.invalidEmail] },
-    name: { type: String, required: [true, _msg.requiredAccountName] },
+    name: { type: String, required: [true, _msg.requiredAccountName], index: true },
     password: { type: String, required: [true, _msg.requiredAccountPassword], select: false, minLength: 3 },
     picture: { type: String },
     roles: { 
@@ -26,32 +26,38 @@ const accountSchema = mongoose.Schema({
             },
             message: `Allowed types: ${_enum.toValueList(_enum.roles)}`
         },
+        sparse: true
     },
-    playlists: [{
-        name: { type: String, enum: _enum.toKeyList(_enum.playlists) },
-        mediaRefs: { type: mongoose.Types.ObjectId, ref: "Media" }
-        // media-Generic-Info
-    }],
-    reviews: [{
-        rating: Number,
-        media: { type: mongoose.Types.ObjectId, ref: "Media" }
-    }],
-    followingTags: [{ 
-        _id: mongoose.Types.ObjectId,
-        name: String
-    }]
+    playlists: {
+        type: [{
+            name: { type: String, enum: _enum.toKeyList(_enum.playlists) },
+            _id: { type: mongoose.Types.ObjectId, ref: "Media"},
+            mediaName: String,
+            mediaPicture: String
+        }],
+        default: undefined
+    },
+    reviews: {
+        type: [{
+            _id: { type: mongoose.Types.ObjectId },
+            rating: Number,
+            comment: String,
+            media: { type: mongoose.Types.ObjectId, ref: "Media" }        
+        }],
+        default: undefined
+    },
+
+    followingTags: {
+        type: [{
+            _id: mongoose.Types.ObjectId,
+            name: String           
+        }],
+        default: undefined
+    }
 },
 {
     timestamps: true
 })
-
-//Indexes
-accountSchema.index({ "email": 1 })
-accountSchema.index({"roles.user": 1}, {sparse: true})
-accountSchema.index({"roles.admin": 1}, {sparse: true})
-accountSchema.index({"roles.actor": 1}, {sparse: true})
-accountSchema.index({"roles.director": 1}, {sparse: true})
-
 
 //Virtuals
 
