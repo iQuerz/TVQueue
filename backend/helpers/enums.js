@@ -23,7 +23,6 @@ module.exports = {
         type: {
             trending: "Trending",
             featured: "Featured",
-            ourpicks: "Our Picks"
         },
     },
 

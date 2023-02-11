@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const _media = require("../services/mediaService");
+const _account = require("../services/accountService");
 
 const _auth = require("../services/authService");
 const _mw = require("../helpers/middlewares")
@@ -31,6 +32,9 @@ router.route("/:mediaId")
 //     .patch(_account.patchAccount)
 //     .delete(_account.deleteAccount)
 
+//Media + Review
+router.route("/:mediaId/reviews")
+    .post(_mw.access.protect, _media.addReview)
 // //Accounts + Tags
 // router.route("/:accountId/tags")
 //     .post(_account.addFollowingTags)

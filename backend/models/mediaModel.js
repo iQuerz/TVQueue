@@ -11,7 +11,8 @@ const mediaSchema = mongoose.Schema({
     picture: String,
     description: String,
     airedDate: { type: Date, index: true},
-    rating: { type: Number, default: 0 },
+    avgRating: { type: Number, default: 0 },
+    rating: { type: Number, default: 0 }, // trendiness
     reviewCount: { type: Number, default: 0 },
     parent: {
         _id: { type: mongoose.Types.ObjectId },
@@ -27,11 +28,17 @@ const mediaSchema = mongoose.Schema({
         },
         required: false
     },
-    participated: [{
-        role: { type: String, enum: _enum.toKeyList(_enum.roles) },
-        accountId: { type: mongoose.Types.ObjectId },
-        accountName: String
-    }],
+    participated: {
+        type: [{
+            role: { type: String, enum: _enum.toKeyList(_enum.roles) },
+            accountId: { type: mongoose.Types.ObjectId },
+            accountName: String
+        }],
+        _id: false,
+        default: undefined
+    },
+    
+    
     reviews: {
         type: [{
             _id: { type: mongoose.Types.ObjectId },
@@ -56,6 +63,7 @@ const mediaSchema = mongoose.Schema({
                 },
             },     
         }],
+        _id: false,
         default: undefined
     },
 
@@ -64,6 +72,7 @@ const mediaSchema = mongoose.Schema({
             _id: mongoose.Types.ObjectId,
             name: String           
         }],
+        _id: false,
         default: undefined
     }    
 },
