@@ -31,7 +31,8 @@ function MediaItem(props) {
     const navigate = useNavigate();
     function showMore(){
         //ovde cemo i guess u local storage da stavimo media koju je izabrao i na onaj sajt cemo da fethujemo podatke o njemu i guess
-        localStorage.setItem('pickedMedia', JSON.stringify(props.media)) //bice id 
+        console.log(props.media)
+        localStorage.setItem('pickedMedia', props.media._id) //bice id 
         navigate("/media")
     }
     //body za svaki idem pojedinacno

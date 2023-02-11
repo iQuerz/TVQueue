@@ -1,10 +1,17 @@
 
 import { Box, Button, Card, TextField, Typography } from "@mui/material";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useState } from "react";
+import CheckList from "../Components/Custom/CheckList";
+import SelectComponent from "../Components/Custom/SelectComponent";
+import Utility from "../Utility";
 
 function AdminPage() {
 
+
+    useEffect(()=>{
+        getAllTags();
+    },[])
     //#region Add Tag
     let [tagName, setTagName] = useState("");
     function onTagNameChange(event){
@@ -15,25 +22,11 @@ function AdminPage() {
         tryAddTag();
     }
     async function tryAddTag(){
-        try {
             const tag = {name: tagName}
-            const body = JSON.stringify(tag);
-            // const response = await fetch('', {
-            //     method: 'POST',
-            //     body: body,
-            //     headers: { "Content-Type": "application/json"}
-            // });
-            // const json = await response.json();
-            
-            // if(response.ok)
-            // {
-            //     console.log("Tag added")
-            //     setTagName("");
-            // }
-        } catch (error) {
-            //setErrorMsg(error)
-            console.error(error);
-        }
+            Utility.fetchData("http://localhost:3000/api/tags/","POST",tag)
+            .then( data => {
+                console.log(data)
+            })
     }
     //#endregion
 
@@ -54,25 +47,13 @@ function AdminPage() {
         tryLoadTag();
     }
     async function tryLoadTag(){
-        try {
-            const tag = {name: tagSearch}
-            const body = JSON.stringify(tag);
-            // const response = await fetch('', {
-            //     method: 'POST',
-            //     body: body,
-            //     headers: { "Content-Type": "application/json"}
-            // });
-            // const json = await response.json();
-            
-            // if(response.ok)
-            // {
-            //     console.log("Tag added")
-            //     setTagName("");
-            // }
-        } catch (error) {
-            //setErrorMsg(error)
-            console.error(error);
-        }
+
+            // const tag = {name: tagSearch}
+            // const body = JSON.stringify(tag);
+            // Utility.fetchData("http://localhost:3000/api/tags/","POST",tag)
+            // .then( data => {
+            //     console.log(data)
+            // })
     }
 
     //----------UPDATE----------
@@ -129,30 +110,16 @@ function AdminPage() {
         tryAddAccount();
     }
     async function tryAddAccount(){
-        try {
             const account = {
                 name: accountName,
                 email: accountEmail,
                 password: accountPassword,
                 picture: accountPicture
             }
-            const body = JSON.stringify(account);
-            // const response = await fetch('', {
-            //     method: 'POST',
-            //     body: body,
-            //     headers: { "Content-Type": "application/json"}
-            // });
-            // const json = await response.json();
-            
-            // if(response.ok)
-            // {
-            //     console.log("Tag added")
-            //     setTagName("");
-            // }
-        } catch (error) {
-            //setErrorMsg(error)
-            console.error(error);
-        }
+            Utility.fetchData("http://localhost:3000/api/accounts/register","POST", account)
+        .then(data => {
+            console.log(data)
+        })
     }
     //#endregion
 
@@ -168,37 +135,136 @@ function AdminPage() {
     function onNewAccountPasswordChange(event){ setNewAccountPassword(event.target.value); }
     let [newAccountPicture, setNewAccountPicture] = useState("");
     function onNewAccountPictureChange(event){ setNewAccountPicture(event.target.value); }
+    let [loadedAccountID, setLoadedAccountID] = useState("");
 
     function loadAccountClick(){
         tryLoadAccount();
     }
     async function tryLoadAccount(){
+        Utility.fetchData("http://localhost:3000/api/accounts?email="+accountSearch)
+        .then(data => {
+            console.log(data[0])
+            if(data[0])
+            {
+                setLoadedAccountID(data[0]._id)
+                setNewAccountName(data[0].name)
+                setNewAccountEmail(data[0].email)
+                setNewAccountPicture(data[0].picture)
+
+            }
+        })
     }
 
     function deleteAccountClick(){
-
+        Utility.fetchData("http://localhost:3000/api/accounts/"+loadedAccountID,"DELETE")
+        .then(data => {
+            console.log(data)
+        })
     }
     function updateAccountClick(){
-
+        const account = {
+            name: newAccountName,
+            email: newAccountEmail,
+            picture: newAccountPicture
+        }
+        Utility.fetchData("http://localhost:3000/api/accounts/"+loadedAccountID,"PATCH",account)
+        .then(data => {
+            console.log(data)
+        })
     }
     //#endregion
+    //#region Add Actor/Director
+    let [actorName, setActorName] = useState("");
+    function onActorNameChange(event){ setActorName(event.target.value); }
+    let [actorPicture, setActorPicture] = useState("");
+    function onActorPictureChange(event){ setActorPicture(event.target.value); }
+    const [roleOptions,setRoleOptions] = useState([{_id:"Actor",name:"Actor"},{_id:"Director",name :"Director"}]);
+    const [selectedRole,setSelectedRole] = useState([]);
+    function hadnleRoleChange(option){
+        console.log(option)
+        if(option)
+        {
+            setSelectedRole(option);
+        }
+    }
 
+    function addActorClick(){
+        tryAddActor();
+    }
+    async function tryAddActor(){
+
+            const roles = {actor:(selectedRole.find(el=>el=="Actor")? true : false),director:(selectedRole.find(el=>el=="Director")?true :false)}
+            const account = {
+                name: actorName,
+                picture: actorPicture,
+                roles:roles
+            }
+            console.log(account)
+            Utility.fetchData("http://localhost:3000/api/accounts","POST", account)
+        .then(data => {
+            console.log(data)
+        })
+    }
+    //#endregion
     //#region Add Show/Movie
     let [mediaName, setMediaName] = useState("");
     function onMediaNameChange(event){ setMediaName(event.target.value); }
     let [mediaDesc, setMediaDesc] = useState("");
     function onMediaDescChange(event){ setMediaDesc(event.target.value); }
-    let [mediaType, setMediaType] = useState("");
-    function onMediaTypeChange(event){ setMediaType(event.target.value); }
     let [mediaDate, setMediaDate] = useState("");
     function onMediaDateChange(event){ setMediaDate(event.target.value); }
     let [mediaPicture, setMediaPicture] = useState("");
     function onMediaPictureChange(event){ setMediaPicture(event.target.value); }
+    const typeOptions = useRef([{name:"Movie"},{name :"Tv Show"}]);
+    const [mediaType,setMediaType] = useState("");
 
+    const [allTags,setAllTags] = useState([]);
+    const [allActors,setActors] = useState([]);
+    const [selectedTags,setSelectedTags] = useState([]);
+    function handleTypeChange(event){
+        setMediaType(event);
+      }
+    function handleSetChecked(options){
+        if(options)
+        {
+            setSelectedTags(options)
+        }
+    }
     function addMediaClick(){
         tryAddMedia();
     }
+    function getAllTags(){
+        Utility.fetchData("http://localhost:3000/api/tags")
+        .then(data => {
+            setAllTags(data)
+        })
+    }
+    function getAllActors(){
+        Utility.fetchData("http://localhost:3000/api/accounts")
+        .then(data => {
+            console.log(data)
+            setActors(data)
+        })
+    }
     async function tryAddMedia(){
+        //const tags =[]
+          const tags = selectedTags.map(id => {
+            const foundTag = allTags.find(tag => tag._id === id);
+            return { _id: id, name: foundTag.name };
+          });
+          console.log(tags)
+        const media = {
+            name: mediaName,
+            type: mediaType.name,
+            picture: mediaPicture,
+            description: mediaDesc,
+            airedDate: mediaDate,
+            tags: tags
+        }
+        Utility.fetchData("http://localhost:3000/api/media","POST", media)
+    .then(data => {
+        console.log(data)
+    })
     }
     //#endregion
 
@@ -219,7 +285,6 @@ function AdminPage() {
     function onEpisodeDateChange(event){ setEpisodeDate(event.target.value); }
     let [episodePicture, setEpisodePicture] = useState("");
     function onEpisodePictureChange(event){ setEpisodePicture(event.target.value); }
-
     function addEpisodeClick(){
         tryAddEpisode();
     }
@@ -253,22 +318,23 @@ function AdminPage() {
 
                 {/* ADD ACCOUNT */}
                 <Card className="flex-down seperate-children-small padding">
-                    <Typography variant="h5">Add Account</Typography>
+                    <Typography variant="h5">Add Account(register)</Typography>
                     <TextField label="Name" value={accountName} onChange={onAccountNameChange}></TextField>
                     <TextField label="Email" value={accountEmail} onChange={onAccountEmailChange}></TextField>
                     <TextField label="Password" value={accountPassword} onChange={onAccountPasswordChange}></TextField>
                     <TextField label="Picture URL" value={accountPicture} onChange={onAccountPictureChange}></TextField>
                     <Button type="contained" onClick={addAccountClick}>Add</Button>
                 </Card>
+                
 
                 {/* EDIT ACCOUNT */}
                 <Card className="flex-down seperate-children-small padding">
                     <Typography variant="h5">Edit Account</Typography>
-                    <TextField label="Email" value={accountSearch} onChange={setAccountSearch}></TextField>
+                    <TextField label="Email" value={accountSearch} onChange={onAccountSearchChange}></TextField>
                     <Button type="contained" onClick={loadAccountClick}>Load</Button>
                     <TextField label="Name" value={newAccountName} onChange={onNewAccountNameChange}></TextField>
                     <TextField label="Email" value={newAccountEmail} onChange={onNewAccountEmailChange}></TextField>
-                    <TextField label="Password" value={newAccountPassword} onChange={onNewAccountPasswordChange}></TextField>
+                    {/* <TextField label="Password" value={newAccountPassword} onChange={onNewAccountPasswordChange}></TextField> */}
                     <TextField label="Picture URL" value={newAccountPicture} onChange={onNewAccountPictureChange}></TextField>
                     <Box className="flex-right">
                         <Button type="contained" onClick={deleteAccountClick}>Delete</Button>
@@ -276,14 +342,30 @@ function AdminPage() {
                     </Box>
                 </Card>
 
+                {/* ADD ACTOR/DIRECTOR */}
+                <Card className="flex-down seperate-children-small padding">
+                    <Typography variant="h5">Add Actor/Director</Typography>
+                    <TextField label="Name" value={actorName} onChange={onActorNameChange}></TextField>
+                    <TextField label="Picture URL" value={actorPicture} onChange={onActorPictureChange}></TextField>
+                    <CheckList items={roleOptions} setChecked={hadnleRoleChange}>
+                    </CheckList>
+                    <Button type="contained" onClick={addActorClick}>Add</Button>
+                </Card>
+
                 {/* ADD MOVIE/SHOW */}
                 <Card className="flex-down seperate-children-small padding">
                     <Typography variant="h5">Add Show/Movie</Typography>
                     <TextField label="Title" value={mediaName} onChange={onMediaNameChange}></TextField>
                     <TextField label="Description" value={mediaDesc} onChange={onMediaDescChange}></TextField>
-                    <TextField label="Type (select)" value={mediaType} onChange={onMediaTypeChange}></TextField>
+                    <SelectComponent
+                        label={"Type"}
+                        options={typeOptions.current}
+                        onChange={handleTypeChange}
+                        />
                     <TextField label="" type={"date"} value={mediaDate} onChange={onMediaDateChange}></TextField>
                     <TextField label="Picture URL" value={mediaPicture} onChange={onMediaPictureChange}></TextField>
+                    <CheckList items={allTags} setChecked={handleSetChecked}>
+                    </CheckList>
                     <Box className="flex-right">
                         <Button type="contained" onClick={addMediaClick}>Add</Button>
                     </Box>
@@ -296,7 +378,11 @@ function AdminPage() {
                     <TextField label="Description" value={episodeDesc} onChange={onEpisodeDescChange}></TextField>
                     <TextField label="Season" type={"number"} value={episodeSeason} onChange={onEpisodeSeasonChange}></TextField>
                     <TextField label="Episode" type={"number"} value={episodeNumber} onChange={onEpisodeNumberChange}></TextField>
-                    <TextField label="Type (select)" value={episodeType} onChange={onEpisodeTypeChange}></TextField>
+                    <SelectComponent
+                        label={"Type"}
+                        options={typeOptions.current}
+                        onChange={handleTypeChange}
+                        />
                     <TextField label="" type={"date"} value={episodeDate} onChange={onEpisodeDateChange}></TextField>
                     <TextField label="Parent (select)" value={episodeParent} onChange={onEpisodeParentChange}></TextField>
                     <TextField label="Picture URL" value={episodePicture} onChange={onEpisodePictureChange}></TextField>

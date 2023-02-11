@@ -24,9 +24,11 @@ function LoginPage(props) {
         console.log(user)
         Utility.fetchData("http://localhost:3000/api/accounts/login", "POST", user)
         .then(data => {
-            if(data)
+            if(data && data.status != 400)
+            {
                 props.onLogin();
                 navigate("/home");
+            }
         })
         .catch(error => console.error(error));
     }
@@ -54,10 +56,6 @@ function LoginPage(props) {
             <Typography variant="subtitle1" color="textPrimary">
                 Don't have an account? <Link to="Register">Sign up!</Link>
             </Typography>
-            <Button onClick={()=>{
-                console.log(document.cookie)
-            }}>Coockie</Button>
-                        <Button onClick={getMe}>getMe</Button>
         </Box>
     )
 }

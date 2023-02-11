@@ -2,6 +2,7 @@ import { Card,Box,Paper,Typography, Avatar, Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useRef } from "react";
 import TagBubble from "../Components/Custom/TagBubble";
+import Utility from "../Utility";
 
 
 function MediaPage() {
@@ -9,10 +10,18 @@ function MediaPage() {
 
     useEffect(()=>{
         //setMedia(JSON.parse(localStorage.getItem('pickedMedia')));
-        //prebacio sam u state, ne bi se
-        //fetch u media posle
+        mediaID.current = localStorage.getItem('pickedMedia');
+        console.log(mediaID.current)
+        fetchMedia();
     },[])
 
+    function fetchMedia(){
+        Utility.fetchData("http://localhost:3000/api/media/"+mediaID.current)
+        .then(data =>{
+            console.log(data)
+            setMedia(data)
+        })
+    }
     const [media, setMedia] = useState(
         {
             name: "Shrek",
@@ -31,7 +40,7 @@ function MediaPage() {
             <Box className="flex-right" width={"var(--ui-width)"}>
                 <img src={media.picture} className="media-image"></img>
                 <Box className="flex-down" marginLeft={"1em"}>
-                    <Typography variant="h2">{media.name} ({media.date ? media.date.substring(0,4) : ""})</Typography>
+                    <Typography variant="h2">{media.name} ({media.airedDate ? media.airedDate.substring(0,4) : ""})</Typography>
                     <Typography variant="h4">{media.rating ? media.rating+"/10" : "no rating"}</Typography>
                     <Box className="flex-right" sx={{flexWrap:"wrap"}}>
                         {media.tags?
