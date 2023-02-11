@@ -1,15 +1,16 @@
 class Utility {
     static handleResponse(response) {
         if (!response.ok) {
-        throw new Error(`${response.status}: ${response.statusText}`);
+            return response;
         }
         return response.json();
     }
 
     //default verzija salje cookies kako treba
     static async fetchData(url, method = 'GET', body = null, headers = {}) {
+        let response = "";
         try {
-        const response = await fetch(url, {
+        response = await fetch(url, {
             credentials: 'include',
             method : method,
             headers: {
@@ -18,10 +19,10 @@ class Utility {
             },
             ...(body ? { body: JSON.stringify(body) } : {})
         });
-        return await Utility.handleResponse(response);
         } catch (error) {
         console.error(error);
         }
+        return await Utility.handleResponse(response);
     }
 }
 export default Utility

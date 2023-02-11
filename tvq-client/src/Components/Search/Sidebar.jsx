@@ -13,7 +13,6 @@ function SideBar(props){
     function getAllTags(){
         Utility.fetchData("http://localhost:3000/api/tags")
         .then(data => {
-            console.log(data)
             setTags(data)
             props.onChange(data[0])
         })
