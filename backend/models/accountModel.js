@@ -31,10 +31,11 @@ const accountSchema = mongoose.Schema({
     playlists: {
         type: [{
             name: { type: String, enum: _enum.toKeyList(_enum.playlists) },
-            _id: { type: mongoose.Types.ObjectId, ref: "Media"},
+            mediaRef: { type: mongoose.Types.ObjectId },
             mediaName: String,
             mediaPicture: String
         }],
+        _id: false,
         default: undefined
     },
     reviews: {

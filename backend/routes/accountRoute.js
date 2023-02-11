@@ -25,6 +25,9 @@ router.route("/me/playlists/:playlist")
 
 router.route("/me/playlists/:playlist/:mediaId")
     .delete(_mw.access.protect, _account.getMe, _account.deleteMediaFromPlaylist)
+
+router.route("/me/playlists")
+    .get(_mw.access.protect, _account.getMe, _account.getAllPlaylists)
     
 //Accounts
 router.route("/")
@@ -49,6 +52,9 @@ router.route("/:accountId/playlists/:playlist")
 
 router.route("/:accountId/playlists/:playlist/:mediaId")
     .delete(_account.deleteMediaFromPlaylist)
+
+router.route("/me/playlists")
+    .get(_account.getAllPlaylists)
 
 //Accounts + Reviews
 
