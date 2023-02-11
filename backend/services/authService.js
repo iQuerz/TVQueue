@@ -18,11 +18,12 @@ const signToken = (id, res) => {
 
 const register = asyncHandler(async (req, res, next) => {
     const { email, name, password, picture } = req.body;
-    const createdAccount = await _accountContext.create({ email, name, password, picture})
 
+    const createdAccount = await _accountContext.create({ email, name, password, picture })
+    
     const token = signToken(createdAccount._id, res)
 
-    res.status(_code.created).json(token + "\n" +_msg.registeredAccount)
+    res.status(_code.created).json(_msg.registeredAccount)
 })
 
 const login = asyncHandler(async (req, res, next) => {
@@ -39,7 +40,7 @@ const login = asyncHandler(async (req, res, next) => {
 
     const token = signToken(account._id, res)
 
-    res.status(_code.ok).json(token + "\n" + _msg.loggedInAccount)
+    res.status(_code.ok).json(_msg.loggedInAccount)
 })
 
 const logout = asyncHandler(async (req, res, next) => {

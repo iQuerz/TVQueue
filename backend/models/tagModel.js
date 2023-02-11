@@ -9,7 +9,7 @@ const _enum = require("../helpers/enums")
 const tagSchema = new mongoose.Schema({
     name: { type: String, required: [true, _msg.requiredTagName], unique: true },
     mediaCount: { type: Number, default: 0 }, 
-    mediaEmbedded: { 
+    mediaEmbedded: {
         type: [{
             _id: { type: mongoose.Types.ObjectId, index: true },
             type: { type: String, enum: _enum.toValueList(_enum.media) },
@@ -18,19 +18,14 @@ const tagSchema = new mongoose.Schema({
             rating: Number,
             airedDate: Date
         }],
-        required: false
-    }
+        index: true
+    } 
 }, 
 { 
     timestamps: true, 
     // id: false,
     // toJSON: { virtuals: true }
 })
-
-//Indexes
-tagSchema.index(
-    { "mediaEmbedded._id": 1 }
-)
 
 //Virtuals
 

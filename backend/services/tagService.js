@@ -2,6 +2,8 @@ const mongoose = require("mongoose")
 const asyncHandler = require("express-async-handler")
 
 const _tagContext = require("../models/tagModel")
+const _accountContext = require("../models/accountModel")
+const _mediaContext = require("../models/mediaModel")
 
 const _code = require("../helpers/statusCodes")
 const _msg = require("../helpers/msg")
@@ -19,7 +21,7 @@ const validator = { runValidators: true }
 //@Description: Povlaci sve tagove
 const getAllTags = asyncHandler(async (req, res) => {
     const tagName = (req.query.name) ? new RegExp("^" + req.query.name?.replace("+", " ") + "$", "i") : {$nin: _enum.toKeyList(_enum.staticTags)}
-    console.log(tagName)
+
     const skip = parseInt((req.query.skip) ?? 0)
     const limit = parseInt((req.query.limit) ?? 10)
 
@@ -72,8 +74,11 @@ const patchTag = asyncHandler(async (req, res) => {
     if(req.body.mediaCount) _mw.error.send(res, _code.forbidden, _msg.forbiddenMediaCount)
     if(req.body.mediaEmbedded?.length > 0) _mw.error.send(res, _code.forbidden, _msg.forbiddenMediaEmbedded)
 
-    const updatedTag = await _tagContext.findByIdAndUpdate({ _id: tagId }, req.body)
+    const updatedTag = await _tagContext.findByIdAndUpdate({ _id: tagId }, req.body, { new: true })
 
+    //Ne dao bog da mora da se update-uje naziv taga, nz kako bi neko prejebao to
+    if(req.body.name) await _accountContext.updateMany({"followingTags._id": updatedTag._id}, { $set: { "followingTags.$.name": updatedTag.name }})
+    
     res.status((updatedTag) ? _code.ok : _code.noContent).json(_msg.updatedTag)
 })
 
@@ -167,11 +172,15 @@ const addCustomMediaInTag = asyncHandler(async (req, res) => {
 
     const exist = await _tagContext.exists({ _id: tagId, "mediaEmbedded._id": customMedia._id})    
     if(exist) _mw.error.send(res, _code.badRequest, _msg.existCustomMediaInTag)
+    console.log(exist)
 
-    const result = await _tagContext.updateOne({ _id: tagId }, { $push: { mediaEmbedded: customMedia}, $inc: { mediaCount: 1 }}, validator)
+    const result = await _tagContext.findOneAndUpdate({ _id: tagId }, { $push: { mediaEmbedded: customMedia}, $inc: { mediaCount: 1 }}, { runValidators: true, select: "_id name"})
     
-    if (result.modifiedCount === 0)
-        _mw.error.send(res, _code.noContent, "")
+    if (!result)
+        _mw.error.send(res, _code.noContent, _msg.mediaToTagFail)
+
+    await _mediaContext.updateOne({ _id: customMedia._id }, { $push: { tags: { _id: result._id, name: result.name }}})
+
  
     res.status(_code.created).json(_msg.addedMediaToTag)
 })
@@ -212,6 +221,7 @@ const deleteCustomMediaInTag = asyncHandler(async (req, res) => {
     if(!exist) _mw.error.send(res, _code.notFound, _msg.mediaInTagNotFound)
 
     await _tagContext.updateOne({ _id: tagId }, { $pull: { mediaEmbedded: { _id: mediaId }}, $inc: { mediaCount: -1 }})
+    await _mediaContext.updateOne({ _id: mediaId }, { $pull: { tags: { _id: tagId }}})
 
     res.status(_code.ok).json(_msg.deletedMediaInTag)
 })

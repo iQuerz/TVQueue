@@ -6,7 +6,8 @@ module.exports = {
             user: "User",
             admin: "Admin",
             actor: "Actor",
-            director: "Director"
+            director: "Director",
+            participated: "Participated"
         },
     },
 

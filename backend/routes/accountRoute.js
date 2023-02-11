@@ -4,7 +4,6 @@ const router = express.Router();
 const _account = require("../services/accountService");
 const _auth = require("../services/authService");
 const _mw = require("../helpers/middlewares")
-const _enum = require("../helpers/enums")
 
 //Login + Register
 router.post("/register", _auth.register)
@@ -20,6 +19,12 @@ router.route("/me")
 router.route("/me/tags")
     .post(_mw.access.protect, _account.getMe,_account.addFollowingTags)
     .delete(_mw.access.protect, _account.getMe, _account.removeFollowingTags)
+
+router.route("/me/playlists/:playlist")
+    .post(_mw.access.protect, _account.getMe, _account.addMediaToPlaylist)
+
+router.route("/me/playlists/:playlist/:mediaId")
+    .delete(_mw.access.protect, _account.getMe, _account.deleteMediaFromPlaylist)
     
 //Accounts
 router.route("/")
@@ -39,6 +44,11 @@ router.route("/:accountId/tags")
 
 
 //Accounts + Playlists
+router.route("/:accountId/playlists/:playlist")
+    .post(_account.addMediaToPlaylist)
+
+router.route("/:accountId/playlists/:playlist/:mediaId")
+    .delete(_account.deleteMediaFromPlaylist)
 
 //Accounts + Reviews
 

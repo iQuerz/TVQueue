@@ -4,6 +4,8 @@ module.exports = {
     requiredBody: "Body is required for this method",
     wrongUrl: "The link you've tried to access doesn't exist",
     noPermissions: "You don't have permission for this action",
+    success: "Operation was successful",
+    failed: "Operation failed",
     
     //Account
     createdAccount: "Account has been created",
@@ -40,12 +42,14 @@ module.exports = {
     updatedAccountTagFailed: "Account tag name has been updated",
     
     //Media
+    parentUpdated: "Child connected with parent",
 
     //Tag
     updatedTag: "Successfully updated the tag",
     deletedTag: "Successfully deleted the tag",
 
     addedMediaToTag: "Successfully inserted media in the tag",
+    mediaToTagFail: "Adding media to tag failed",
     updatedMediaInTag: "Successfully updated media in the tag",
     deletedMediaInTag: "Successfully deleted media in the tag",
 
