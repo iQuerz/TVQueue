@@ -154,7 +154,38 @@ const updateFollowingTag = asyncHandler(async (req, res) => {
 //==============================================================================================================================================//
 //#region Accounts + Playlists
 
-//@POST: "/api/accounts/_ACCOUNT_ID_/playlist/_PLAYLIST_NAME_"
+//@GET: "/api/accounts/_ACCOUNT_ID_/playlists?limit=_NUM_"
+//@Access: PUBLIC
+//@Roles: ADMIN
+//@Description: Vraca sve playliste
+const getAllPlaylists = asyncHandler( async (req, res) => {
+    const accountId = req.params.accountId
+    const limit = parseInt((req.query.limit) ?? 10)
+
+
+    // const obj = { playlists: { name: playlistName, mediaRef: media._id, mediaName: media.name, mediaPicture: media.picture } }
+    const result = await _accountContext.aggregate([
+        { $match: { 
+            _id: accountId 
+        }},
+        { $unwind: "$playlists"},
+        { $group: {
+            _id: "$playlists.name",
+            media: { $push: { _id: "$playlists.mediaRef", name: "$playlists.mediaName", picture: "$playlists.mediaPicture"} }
+        }},
+        { $project: {
+            _id: 0,
+            name: "$_id",
+            media: { $slice: ["$media", limit] }
+        }},
+    ])
+    
+    res.status(_code.ok).json(result)
+
+    // res.status((success) ? _code.ok : _code.badRequest).json(success ? _msg.success : _msg.failed)
+})
+
+//@POST: "/api/accounts/_ACCOUNT_ID_/playlists/_PLAYLIST_NAME_"
 //@Access: PUBLIC
 //@Roles: ADMIN
 //@Description: Dodaje listu tagova [tags] u account
@@ -163,14 +194,15 @@ const addMediaToPlaylist = asyncHandler( async (req, res) => {
     const playlistName = req.params.playlist
     const media = _obj.filter(req.body, "_id", "name", "picture")
 
-    const obj = { playlists: { name: playlistName, _id: media._id, mediaName: media.name, mediaPicture: media.picture } }
-    const result = await _accountContext.updateOne({ _id: accountId}, { $push: obj })
+    const obj = { playlists: { name: playlistName, mediaRef: media._id, mediaName: media.name, mediaPicture: media.picture } }
+
+    const result = await _accountContext.updateOne({ _id: accountId, "playlists.mediaRef": { $nin: [media._id]}}, { $push: obj })
     const success = result.modifiedCount !== 0
 
     res.status((success) ? _code.ok : _code.badRequest).json(success ? _msg.success : _msg.failed)
 })
 
-//@DELETE: "/api/accounts/_ACCOUNT_ID_/playlist/_PLAYLIST_NAME_/_MEDIA_ID_"
+//@DELETE: "/api/accounts/_ACCOUNT_ID_/playlists/_PLAYLIST_NAME_/_MEDIA_ID_"
 //@Access: PUBLIC
 //@Roles: ADMIN
 //@Description: Dodaje listu tagova [tags] u account
@@ -179,9 +211,8 @@ const deleteMediaFromPlaylist = asyncHandler( async (req, res) => {
     const playlistName = req.params.playlist
     const mediaId = req.params.mediaId
 
-    const obj = { "playlists.media.id": mediaId }
-    const result = await _accountContext.updateOne({ _id: accountId, "playlists.name": playlistName}, { $pull: { "playlists": { _id: mediaId } } })
-    // const bruh = await _accountContext.findById( {_id: accountId}, {playlists: 1} ).populate("playlists._id")
+    const result = await _accountContext.updateOne({ _id: accountId, "playlists.name": playlistName}, { $pull: { "playlists": { mediaRef: mediaId } } })
+    // const bruh = await _accountContext.findById( {_id: accountId}, {playlists: 1} ).populate("playlists.mediaRef")
     res.status((result) ? _code.ok : _code.badRequest).json(result ? _msg.success : _msg.failed)
 })
 //#endregion
@@ -221,6 +252,7 @@ module.exports = {
     updateFollowingTag,
 
     //Accounts + Playlists
+    getAllPlaylists,
     addMediaToPlaylist,
     deleteMediaFromPlaylist,
 
