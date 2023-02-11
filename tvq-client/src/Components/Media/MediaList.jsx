@@ -17,7 +17,7 @@ function MediaList(props) {
                     props.media.map((media, index) =>{
                         return <MediaItem className="media-list-element" key={index} media={media}/>
                     })
-                } 
+                }
             </Card>
         </Box>
     );

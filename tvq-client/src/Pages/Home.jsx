@@ -12,6 +12,7 @@ function HomePage() {
     function handleDisplayMediaChange(media){
         setDisplayMedia(media);
     }
+    
     return (
         <Box className="flex-down">
             <MediaCarousel media={displayMedia} onChange={handleDisplayMediaChange}/>
