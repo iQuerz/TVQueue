@@ -39,9 +39,9 @@ function ProfilePage() {
   function getMyPlayList(){
     Utility.fetchData("http://localhost:3000/api/accounts/me/playlists")
     .then(data => {
-        setCurrentlyWatching(data[0].media)
-        setToWatchMedia(data[1].media)
-        setWatchedMedia(data[2].media)
+        setCurrentlyWatching(data.find(el => el.name == "watching").media)
+        setToWatchMedia(data.find(el => el.name == "watchlater").media)
+        setWatchedMedia(data.find(el => el.name == "watched").media)
 
     })
     .catch(error => console.error(error)); 

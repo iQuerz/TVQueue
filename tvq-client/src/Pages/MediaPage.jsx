@@ -75,12 +75,12 @@ function MediaPage() {
                 :""
             }
 
-            {media.actors?
+            {media.participated?
                 <Box className="media-section">
                     <Typography width={"100%"} variant="h4">Cast:</Typography>
                     {
-                        media.actors.map((actor,index) => {
-                            return(<Typography variant="h6" key={index}>{actor}</Typography>)
+                        media.participated.map((actor,index) => {
+                            return(<Typography variant="h6" key={index}>{actor.accountName}</Typography>)
                         })
                     }
                 </Box>
