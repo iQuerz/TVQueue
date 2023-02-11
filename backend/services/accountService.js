@@ -210,7 +210,7 @@ const deleteMediaFromPlaylist = asyncHandler( async (req, res) => {
     const mediaId = req.params.mediaId
 
     const result = await _accountContext.updateOne({ _id: accountId, "playlists.name": playlistName}, { $pull: { "playlists": { mediaRef: mediaId } } })
-    // const bruh = await _accountContext.findById( {_id: accountId}, {playlists: 1} ).populate("playlists.mediaRef")
+   
     res.status((result) ? _code.ok : _code.badRequest).json(result ? _msg.success : _msg.failed)
 })
 //#endregion

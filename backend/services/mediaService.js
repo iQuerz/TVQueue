@@ -54,7 +54,7 @@ const createMedia = asyncHandler(async (req, res) => {
     media._id = mongoose.Types.ObjectId();
 
     const createdMedia = await _mediaContext.create(media)
-
+    console.log(createdMedia.tags)
     if(media.parent) {
         req.params.parentId = media.parent._id
 
@@ -79,7 +79,7 @@ const createMedia = asyncHandler(async (req, res) => {
     res.status(_code.created).json(media)
 })
 
-//@GET: "/api/accounts/:mediaId?skip=_NUM_&limit=_NUM_"
+//@GET: "/api/accounts/:mediaId"
 //@Access: PUBLIC
 //@Roles: ALL
 //@Description: Povlaci media
@@ -88,7 +88,7 @@ const getMedia = asyncHandler(async (req, res) => {
     const skip = parseInt((req.query.skip) ?? 0)
     const limit = parseInt((req.query.limit) ?? 10)
 
-    const includeFields = _obj.one.Name.Type.Picture.Description.AiredDate.Rating.Parent.Reviews(skip, limit).Participated().Tags().Episodes().result
+    const includeFields = _obj.NoTimestamps.__v.result
     const media = await _mediaContext.findOne({ _id: mediaId }, includeFields ).lean()
 
     res.status((media) ? _code.ok : _code.noContent).json(media)
@@ -163,15 +163,15 @@ const connectChildToParent = asyncHandler(async (req, res) => {
 const addReview = asyncHandler( async (req, res) => {
     const mediaId = req.params.mediaId
     const review = _obj.filter(req.body, "rating", "comment")
-    review.userId = req.myAccount._id
+    review._userId = [req.myAccount._id]
     review.name = req.myAccount.name
 
     console.log(review)
-    if (!review.userId) _mw.send(res, _code.forbidden, _msg.notLoggedIn)
+    if (!review._userId) _mw.error.send(res, _code.forbidden, _msg.notLoggedIn)
 
-    const addedReview = await _mediaContext.findOneAndUpdate({ 
+    const media = await _mediaContext.findOneAndUpdate({ 
         _id: mediaId,
-        "reviews._userId": { $nin: [review.userId] }
+        "reviews._userId": { $nin: review._userId }
     },
     { 
         $push: { reviews: review },
@@ -182,15 +182,30 @@ const addReview = asyncHandler( async (req, res) => {
             _id: 1,
             rating: 1,
             avgRating: 1,
-            reviewCount: 1
+            reviewCount: 1,
+            tags: 1
         },
         new: true
     })
-    addedReview.rating = 0.93
-    addedReview.avgRating = 1000
-    addedReview.save()
-    console.log(addedReview)
-    res.status((addedReview) ? _code.ok : _code.badRequest).json(_msg.success)
+    //Tag update
+    if (!media) throw _mw.error.send(res, _code.badRequest, _msg.failed)
+
+    media.avgRating = (media.avgRating) ? parseFloat(((media.avgRating * (media.reviewCount-1)) + review.rating) / media.reviewCount) : review.rating
+    media.rating = _util.trendiness(media.avgRating, media.reviewCount)
+    media.save()
+
+    req.params.tagId = media.tags
+    req.body.rating = media.rating
+    const tagIds = media.tags.map(e => mongoose.Types.ObjectId(e._id))
+    
+    await _tagContext.updateMany({ _id: { $in: tagIds }, "mediaEmbedded._id": media._id}, { $set: { "mediaEmbedded.$.rating": media.rating}})
+    
+    //Account update
+    await _accountContext.findByIdAndUpdate({ _id: review._userId }, { $push: { "reviews": { _id: review._userId, rating: review.rating, comment: review.comment, _mediaId: mediaId } }})
+    res.status(_code.ok).json(_msg.success)
+
+    //Account update
+
 })
 
 // //@DELETE: "/api/accounts/_ACCOUNT_ID_/tags" 

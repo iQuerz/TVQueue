@@ -43,7 +43,7 @@ const accountSchema = mongoose.Schema({
             _id: { type: mongoose.Types.ObjectId },
             rating: Number,
             comment: String,
-            media: { type: mongoose.Types.ObjectId, ref: "Media" }        
+            _mediaId: { type: mongoose.Types.ObjectId, ref: "Media" }        
         }],
         default: undefined
     },

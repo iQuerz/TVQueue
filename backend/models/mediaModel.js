@@ -63,16 +63,14 @@ const mediaSchema = mongoose.Schema({
                 },
             },     
         }],
-        _id: false,
         default: undefined
     },
 
     tags: {
         type: [{
-            _id: mongoose.Types.ObjectId,
+            _id: mongoose.Types.ObjectId, 
             name: String           
         }],
-        _id: false,
         default: undefined
     }    
 },
