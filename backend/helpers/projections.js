@@ -25,7 +25,7 @@ module.exports = {
     get AiredDate() { this.result.airedDate = this.default; return this },
     get Rating() { this.result.rating = this.default; return this },
     get ReviewCount() { this.result.reviewCount = this.default; return this },
-    get Parent() { this.result.reviewCount = this.default; return this },
+    get Parent() { this.result.parent = this.default; return this },
     get Trendiness() { this.result.trendiness = this.default; return this },
 
 
