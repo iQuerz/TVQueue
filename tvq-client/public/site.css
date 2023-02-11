@@ -165,3 +165,28 @@ header nav a {
     .clickable-link:hover{
         text-decoration: underline;
     }
+
+body::-webkit-scrollbar {
+    width: 15px;
+}
+
+/* Track */
+body::-webkit-scrollbar-track {
+    background: #0002;
+}
+
+/* Handle */
+body::-webkit-scrollbar-thumb {
+    background: var(--black-hover);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Handle on hover */
+body::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+body::-webkit-scrollbar-corner {
+    background-color: #0002;
+}
