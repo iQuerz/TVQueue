@@ -1,18 +1,21 @@
 
 .sidebar {
-    position: absolute;
-    top: 72px; /* height of the navigation bar */
-    right: 0;
-    bottom: 0;
-    width: 200px;
-    background-color: #f2f2f2;
+    border: 2px solid transparent;
+    border-left-color: var(--dark-blue);
     padding: 20px;
-  }
-.sidebar > * {
-    background-color: var(--orange)!important;
-    padding: 1em;
+    justify-content: flex-start!important;
+}
+
+.sidebar > button {
+    padding: 0.5em;
+    margin: 0.5em;
     display: block;
+    text-decoration: underline!important;
     color: var(--dark-blue)!important;
+}
+.sidebar > button:hover{
+    background-color: var(--orange);
+    transform: scale(1.1);
 }
   
   .sidebar-nav-button {

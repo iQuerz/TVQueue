@@ -10,8 +10,8 @@ function MediaGrid(props) {
     const [hover, setHover] = useState(false);
 
     return (
-        <Box maxHeight={"60vh"}>
-            <Card className="media-grid-container" variant="outlined" sx={{maxHeight:"60vh", width:"70vw", backgroundColor:"transparent"}}>
+        <Box maxHeight={"80vh"}>
+            <Card className="media-grid-container" variant="outlined" sx={{maxHeight:"80vh", width:"70vw", backgroundColor:"transparent"}}>
                 {
                     props.media.map((media, index) =>{
                         return <MediaItem className="media-grid-element" key={index} media={media}/>

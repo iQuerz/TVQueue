@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Utility from "../../Utility";
@@ -35,7 +35,8 @@ function SideBar(props){
     }
     //trenutno je jako lose uradjen css sidebar nije autoamcki podesen da bude ispod navbar nego je stavljen fixed amount odakle da krece da se ne zbunis 
     return(
-        <div className="sidebar">
+        <Box className="sidebar flex-down">
+            <Typography variant="h4" sx={{color:"var(--orange)!important",textAlign:"center"}}>FILTER TAGS</Typography>
             {
                 tags.map((tag,index) =>{
                     return <Button onClick={()=>{
@@ -43,7 +44,7 @@ function SideBar(props){
                     }} key={index} className="sidebar-nav-button"><h2>{tag.name}</h2></Button>
                 })
             }
-        </div>
+        </Box>
     );
 }
 export default SideBar

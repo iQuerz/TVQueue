@@ -1,4 +1,5 @@
-import { Button, TextField } from "@mui/material";
+import { Search } from "@mui/icons-material";
+import { Box, Button, TextField } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import SelectComponent from "../Components/Custom/SelectComponent";
@@ -237,15 +238,20 @@ function SearchPage() {
   }
   return (
     <>
-      <TextField label="Search" variant="outlined" inputRef={searchString}></TextField>
-      <SelectComponent
-      label={"Filter"}
-      options={filterOptions.current}
-      onChange={handleFilterChange}
-      />
-      <Button onClick={fetchSerac}>Serach</Button>
-      <SideBar onChange={handleSelectedTagChange}></SideBar>
-      <MediaGrid media={displayMedia}></MediaGrid>
+    <Box className="flex-right">
+        <Box className="flex-down margin">
+            <Box className="flex-right">
+                <TextField label="Search" variant="outlined" inputRef={searchString}></TextField>
+                <SelectComponent
+                    label={"Filter"}
+                    options={filterOptions.current}
+                    onChange={handleFilterChange}/>
+                <Button onClick={fetchSerac}><Search/> </Button>
+            </Box>
+            <MediaGrid media={displayMedia}></MediaGrid>:
+        </Box>
+        <SideBar onChange={handleSelectedTagChange}></SideBar>
+    </Box>
     </>
   );
 }
