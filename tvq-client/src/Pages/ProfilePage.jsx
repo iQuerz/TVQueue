@@ -12,22 +12,36 @@ import { useState } from "react";
 import { useRef } from "react";
 import MediaItem from "../Components/Media/MediaItem";
 import MediaList from "../Components/Media/MediaList";
+import Utility from "../Utility";
 
 function ProfilePage() {
-  const email = useRef("Piksi@email.com");
-  const name = useRef("Ivan Bogosavljevic");
-  const picture = useRef(
-    "https://images.pexels.com/photos/2213575/pexels-photo-2213575.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+  const [email,setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [picture,setPicture]=useState(
+    ""
   );
   const [watchedMedia, setWatchedMedia] = useState([]);
   const [toWatchMedia, setToWatchMedia] = useState([]);
   const [currentlyWatching, setCurrentlyWatching] = useState([]);
 
   useEffect(() => {
+    getMe();
     handleWatchedMediaChange();
     handleToWatchMediaChange();
     handleCurrentyluWatchingChange();
   }, []);
+
+  function getMe(){
+    Utility.fetchData("http://localhost:3000/api/accounts/me")
+    .then(data => {
+        console.log(data)
+        setEmail(data.email)
+        setName(data.name)
+        setPicture(data.picture)
+    })
+    .catch(error => console.error(error)); 
+  } 
+
   function handleWatchedMediaChange() {
     setWatchedMedia([{
       name: "Shrek",
@@ -289,13 +303,13 @@ function ProfilePage() {
         <Box className="flex-down">
             <Box className="flex-right margin">
                 <Avatar
-                    alt={name.current}
-                    src={picture.current}
+                    alt={name}
+                    src={picture}
                     sx={{ width: 112, height: 112 }}
                 />
                 <Box className="flex-down margin">
-                    <Typography variant="h5">{name.current}</Typography>
-                    <Typography variant="body1">{email.current}</Typography>
+                    <Typography variant="h5">{name}</Typography>
+                    <Typography variant="body1">{email}</Typography>
                 </Box>
             </Box>
             <Box>

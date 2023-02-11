@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import MediaGrid from "../Components/Media/MediaGrid";
 import SideBar from "../Components/Search/Sidebar";
-
+import Utility from "../Utility";
 function SearchPage() {
   const [selectedTag, setSelectedTag] = useState("");
   const [displayMedia, setDisplayMedia] = useState([]);
@@ -14,10 +14,19 @@ function SearchPage() {
   }, [selectedTag]);
   function handleSelectedTagChange(tag) {
     setSelectedTag(tag);
-    console.log(selectedTag);
+  }
+  function fetchTag(){
+    if(selectedTag._id){
+        Utility.fetchData("http://localhost:3000/api/tags/"+selectedTag._id)
+        .then(data => {
+          console.log(data)
+          setDisplayMedia(data.mediaEmbedded)
+        })
+        .catch(error => console.error(error));
+      }
   }
   //kada bude bilo mozemo actual tag da fetchujemo
-  function fetchTag() {
+  function fetchTag2() {
     //fetthc(selectedTag)
     if (hardCodedDataSwap) {
       setDisplayMedia([

@@ -1,24 +1,43 @@
-import { Typography, Box } from "@mui/material";
+import { Typography, Box, Button } from "@mui/material";
 import { useRef,useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LoginForm from "../Components/Login/LoginForm";
+import Utility from "../Utility";
 
 
 function LoginPage(props) {
-    const email = useRef();
-    const password = useRef();
+    const navigate = useNavigate();
+    const emailLogin = useRef();
+    const passwordLogin = useRef();
     const Name = useRef();
     const sessionID = useRef(); // ili token kako god ga budemo nazvali 
     const [picture, setPicture] = useState("");
     const [errorMsg, setErrorMsg] = useState();
 
     //test podaci se lepo prosledjuju u gornju komponentu
-    function tryUserLogin(){
-        console.log(email.current.value);
-        console.log(password.current.value);
-        sessionID.current = "testSessionID"
-        window.localStorage.setItem('sessionID', sessionID.current.value) // ili token
+    async function tryUserLogin(){
+
+        const user ={
+            email: emailLogin.current.value,
+            password: passwordLogin.current.value
+        }
+        console.log(user)
+        Utility.fetchData("http://localhost:3000/api/accounts/login", "POST", user)
+        .then(data => {
+            if(data)
+                props.onLogin();
+                navigate("/home");
+        })
+        .catch(error => console.error(error));
     }
+    function getMe(){
+        Utility.fetchData("http://localhost:3000/api/accounts/me")
+        .then(data => {
+            console.log(data)
+        }) 
+        .catch(error => console.error(error));
+    }
+
     return(
         <Box className="flex-down" paddingTop={'5em'}>
             <Typography variant="h1" color="textPrimary" textAlign={'center'}>TVQueue</Typography>
@@ -26,8 +45,8 @@ function LoginPage(props) {
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pharetra bibendum tempor.
             </Typography>
             <div className="flex-right seperate-children-big">
-                <LoginForm clickHandler={tryUserLogin} email={email} 
-                           password={password} ></LoginForm>
+                <LoginForm clickHandler={tryUserLogin} email={emailLogin} 
+                           password={passwordLogin} ></LoginForm>
             </div>
             <Typography variant="subtitle1" color="red">
                 {errorMsg}
@@ -35,6 +54,10 @@ function LoginPage(props) {
             <Typography variant="subtitle1" color="textPrimary">
                 Don't have an account? <Link to="Register">Sign up!</Link>
             </Typography>
+            <Button onClick={()=>{
+                console.log(document.cookie)
+            }}>Coockie</Button>
+                        <Button onClick={getMe}>getMe</Button>
         </Box>
     )
 }

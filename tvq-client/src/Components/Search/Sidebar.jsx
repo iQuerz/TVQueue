@@ -1,13 +1,24 @@
 import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import Utility from "../../Utility";
 
 function SideBar(props){
     const [tags,setTags] = useState([]);
     useEffect(()=>{
-        handleTagsFetch();
+        //handleTagsFetch();
+        getAllTags();
     },[])
 
+    function getAllTags(){
+        Utility.fetchData("http://localhost:3000/api/tags")
+        .then(data => {
+            console.log(data)
+            setTags(data)
+            props.onChange(data[0])
+        })
+        .catch(error => console.error(error));
+    }
     function handleTagsFetch(){
         setTags([
             {id: 1, name: "Horror"},
