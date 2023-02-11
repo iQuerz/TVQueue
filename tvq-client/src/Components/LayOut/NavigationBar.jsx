@@ -24,6 +24,7 @@ function NavigationBar(props) {
       <nav >
             <Link to="/home">Home</Link>
             <Link to="/search">Search</Link>
+            { props.logedIn && <Link to="/admin">Admin</Link>}
             { props.logedIn && <Link to="/profile">Profile</Link>}
             { !props.logedIn && <Link to="/login">Log in</Link>}
             { !props.logedIn && <Link to="/register">Register</Link>}

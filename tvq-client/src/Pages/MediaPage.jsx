@@ -1,13 +1,18 @@
 import { Card,Box,Paper,Typography, Avatar, Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useRef } from "react";
+import SelectComponent from "../Components/Custom/SelectComponent";
 import TagBubble from "../Components/Custom/TagBubble";
 import Utility from "../Utility";
 
 
 function MediaPage() {
     const mediaID = useRef();
-
+    const [seasions,setSeasions] = useState([]);
+    const [selectedSeasion, setSelectedSeasion] = useState("")
+    function handleSelectedSeasionChange(event){
+        setSelectedSeasion(event)
+    }
     useEffect(()=>{
         //setMedia(JSON.parse(localStorage.getItem('pickedMedia')));
         mediaID.current = localStorage.getItem('pickedMedia');
@@ -20,6 +25,14 @@ function MediaPage() {
         .then(data =>{
             console.log(data)
             setMedia(data)
+            if(data.episodes)
+                {
+                    const seasonNumbers = data.episodes.map(episode => parseInt(episode.seasonEpisode.split("#")[1].split("-")[0]));
+                    const maxSeasonNumber = Math.max(...seasonNumbers);
+                    const seasons = Array.from({ length: maxSeasonNumber }, (_, index) => ({ name: `Season ${index + 1}` }));
+                    console.log(seasons)
+                    setSeasions(seasons);
+                }
         })
     }
     const [media, setMedia] = useState(
@@ -56,6 +69,22 @@ function MediaPage() {
             {media.description ?
                 <Box className="media-section">
                     <Typography variant="h6">{media.description}</Typography>
+                </Box>
+                :""
+            }
+            {media.episodes?
+                <Box>
+                    <SelectComponent
+                        label={"Seasion"}
+                        options={seasions}
+                        onChange={handleSelectedSeasionChange}
+                        />
+                    <Box>
+                        {media.episodes.map((episode,index)=>{
+                            // if(selectedSeasion == parseInt(episode.sessionEpisode.split("#")[1].split("-")[0]))
+                             return(<Typography key={index}> {episode.name + episode.seasonEpisode}</Typography>)
+                        })}
+                    </Box>
                 </Box>
                 :""
             }
