@@ -39,10 +39,15 @@ function ProfilePage() {
   function getMyPlayList(){
     Utility.fetchData("http://localhost:3000/api/accounts/me/playlists")
     .then(data => {
-        setCurrentlyWatching(data.find(el => el.name == "watching").media)
-        setToWatchMedia(data.find(el => el.name == "watchlater").media)
-        setWatchedMedia(data.find(el => el.name == "watched").media)
-
+        const curentlyWathingData = data.find(el => el.name == "watching")
+        if(curentlyWathingData)
+          setCurrentlyWatching(curentlyWathingData.media)
+        const toWatchData = data.find(el => el.name == "watchlater")
+        if(toWatchData)
+          setToWatchMedia(toWatchData.media)
+        const watchedData = data.find(el => el.name == "watched")
+        if(watchedData)
+          setWatchedMedia(watchedData.media)
     })
     .catch(error => console.error(error)); 
   } 
