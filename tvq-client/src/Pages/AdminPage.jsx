@@ -23,6 +23,7 @@ function AdminPage() {
         tryAddTag();
     }
     async function tryAddTag(){
+            console.log(tagName)
             const tag = {name: tagName}
             Utility.fetchData("http://localhost:3000/api/tags/","POST",tag)
             .then( data => {

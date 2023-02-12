@@ -28,6 +28,7 @@ function MediaPage() {
     function fetchMedia(){
         Utility.fetchData("http://localhost:3000/api/media/"+mediaID.current)
         .then(data =>{
+            console.log(data)
             setMedia(data)
             if(data.episodes)
                 {
@@ -61,7 +62,7 @@ function MediaPage() {
                         setRerender(rerender+1)
                     }} className="clickable-link" variant="h2"> {"Show: " + media.parent.name} </Typography> : ""}
                     <Typography variant="h3">{media.name} ({media.airedDate ? media.airedDate.substring(0,4) : ""})</Typography>
-                    <Typography variant="h4">{media.rating ? media.rating+"/10" : "no rating"}</Typography>
+                    <Typography variant="h4">{media.rating ? media.rating.toFixed(2)+"/10" : "no rating"}</Typography>
                     <Box className="flex-right" sx={{flexWrap:"wrap"}}>
                         {media.tags?
                             media.tags.map((tag, index) =>{
@@ -130,12 +131,12 @@ function MediaPage() {
             }
 
             
-            <ReviewModal open={reviewModalOpen} onClick={handleReviewModalState}></ReviewModal>
+            <ReviewModal open={reviewModalOpen} onClick={handleReviewModalState} mediaID={mediaID}></ReviewModal>
             <Box className="media-section">
                 <Typography width={"100%"} variant="h4">Reviews: <Button variant="contained" size="large" onClick={()=>{handleReviewModalState(true)}}>Add Yours</Button></Typography>
                 {media.reviews?
                     media.reviews.map((review,index) => {
-                        return(<Typography variant="h6" key={index}>{review.value}, "{review.comment}"</Typography>)
+                        return(<Typography variant="h6" key={index}>{review.rating}, "{review.comment}" by :"{review.name}"</Typography>)
                     })
                     :<Typography variant="h6">No reviews yet, be the first to review {media.name}!</Typography>
                 }

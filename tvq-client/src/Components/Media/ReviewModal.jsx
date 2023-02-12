@@ -12,6 +12,7 @@ import {
     } from "@mui/material";
 import { useState } from "react";
 import { useEffect } from "react";
+import Utility from "../../Utility";
   
     const style = {
         position: "absolute",
@@ -30,7 +31,20 @@ import { useEffect } from "react";
         const [reviewText, setReviewText] = useState("");
     
         function submitReview(){
-            //fetch ka serveru
+            const body = {
+                rating: reviewVal,
+                comment: reviewText
+            }
+            console.log(body)
+            console.log(props.mediaID)
+            Utility.fetchData("http://localhost:3000/api/media/"+ props.mediaID.current +"/reviews","POST",body)
+            .then(data=>{
+                if(data.status == 400)
+                {
+                    alert("You already reviewed this")
+                }
+                console.log(data)
+            })
         }
 
         return (
