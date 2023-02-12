@@ -78,7 +78,7 @@ const createMedia = asyncHandler(async (req, res) => {
     res.status(_code.created).json(media)
 })
 
-//@GET: "/api/accounts/:mediaId"
+//@GET: "/api/media/:mediaId"
 //@Access: PUBLIC
 //@Roles: ALL
 //@Description: Povlaci media
@@ -91,6 +91,42 @@ const getMedia = asyncHandler(async (req, res) => {
     const media = await _mediaContext.findOne({ _id: mediaId }, includeFields ).lean()
 
     res.status((media) ? _code.ok : _code.noContent).json(media)
+})
+
+//@DELETE: "/api/media/:mediaId" 
+//@Access: PROTECTED
+//@Roles: ADMIN
+//@Description: Koristi se za kreiranje media
+const deleteMedia = asyncHandler(async (req, res) => {
+    const mediaId = req.params.mediaId
+    //hesus, this what we get for using "embedded" type
+    const removedMedia = await _mediaContext.findOneAndDelete({ _id: mediaId })
+    console.log(removedMedia)
+    if (removedMedia.parent) 
+        await _mediaContext.updateOne({ _id: removedMedia.parent._id}, { $pull: { "episodes": { _id: mediaId } } })
+
+    if (removedMedia.tags) {
+        const bulkOperation = removedMedia.tags.map(tag => { 
+            return { "updateOne" : { "filter" : { "_id" : tag._id }, "update" : { "$pull" : { "mediaEmbedded": {_id: mediaId} }, "$inc": { "mediaCount": -1 } } } }
+        })
+        await _tagContext.bulkWrite(bulkOperation)
+    }
+
+    if (removedMedia.reviews) {
+        const bulkOperation = removedMedia.reviews.map(account => { 
+            return { "updateOne" : { "filter" : { "_id" : account._id }, "update" : { "$pull" : { "reviews": { _mediaId: mediaId } } } } }
+        })
+        await _accountContext.bulkWrite(bulkOperation)
+    }
+
+    if (removedMedia.episodes) {
+        const bulkOperation = removedMedia.episodes.map(episode => { 
+            return { "updateOne" : { "filter" : { "_id" : episode._id }, "update" : { "$pull" : { "parent": { _id: mediaId } } } } }
+        })
+        await _accountContext.bulkWrite(bulkOperation)
+    }
+
+    res.status(_code.noContent).json(removedMedia)
 })
 
 // //@PATCH: "/api/accounts/:accountId"
@@ -245,6 +281,7 @@ module.exports = {
     getAllMedia,
     getMedia,
     createMedia,
+    deleteMedia,
 
     //Media + Parent
     connectChildToParent,

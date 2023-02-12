@@ -30,7 +30,7 @@ router.route("/")
 router.route("/:mediaId")
     .get(_media.getMedia)
 //     .patch(_account.patchAccount)
-//     .delete(_account.deleteAccount)
+    .delete(_media.deleteMedia)
 
 //Media + Review
 router.route("/:mediaId/reviews")
