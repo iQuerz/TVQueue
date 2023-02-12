@@ -230,11 +230,44 @@ const addMediaToPlaylist = asyncHandler( async (req, res) => {
     const playlistName = req.params.playlist
     const media = _obj.filter(req.body, "_id", "name", "picture")
 
-    const obj = { playlists: { name: playlistName, mediaRef: media._id, mediaName: media.name, mediaPicture: media.picture } }
+    const result = await _accountContext.updateOne(
+        { _id: accountId },
+        [{ $addFields: {
+            "playlists": {
+                $filter: {
+                    input: "$playlists",
+                    as: "media",
+                    cond: { $ne: [ "$$media.mediaRef", media._id]}
+                }
+            }
+        }},
+        { $addFields: {
+            "playlists": {
+                $concatArrays: [ { $ifNull: ["$playlists", []]}, [ { name: playlistName, mediaRef: media._id, mediaName: media.name, mediaPicture: media.picture } ]]
+            }
+        }}]
+    )
 
-    const result = await _accountContext.updateOne({ _id: accountId }, { $set: obj }, {upsert: true})
-    const success = result.modifiedCount !== 0
-
+    // const result = await _accountContext.aggregate([
+    //     { $match: {
+    //     }},
+    //     { $addFields: {
+    //         "playlists": {
+    //             $filter: {
+    //                 input: "$playlists",
+    //                 as: "media",
+    //                 cond: { $ne: [ "$$media.mediaRef", media._id]}
+    //             }
+    //         }
+    //     }},
+    //     { $addFields: {
+    //         "playlists": {
+    //             $concatArrays: [ { $ifNull: ["$playlists", []]}, [ { name: playlistName, mediaRef: media._id, mediaName: media.name, mediaPicture: media.picture } ]]
+    //         }
+    //     }}
+    // ])
+    const success = result
+    console.log(result)
     res.status((success) ? _code.ok : _code.badRequest).json(success ? _msg.success : _msg.failed)
 })
 
