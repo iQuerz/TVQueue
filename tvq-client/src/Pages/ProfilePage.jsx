@@ -66,9 +66,9 @@ function ProfilePage() {
                 </Box>
             </Box>
             <Box>
-                    <MediaList title="Currently Watching" media={currentlyWatching}></MediaList>
-                    <MediaList title="To Watch" media={toWatchMedia}></MediaList>
+                    <MediaList title="Watchlist" media={toWatchMedia}></MediaList>
                     <MediaList title="Watched" media={watchedMedia}></MediaList>
+                    <MediaList title="Currently Watching" media={currentlyWatching}></MediaList>
             </Box>
         </Box>
     );

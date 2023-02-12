@@ -11,6 +11,7 @@ function AdminPage() {
 
     useEffect(()=>{
         getAllTags();
+        getAllTvShows();
     },[])
     //#region Add Tag
     let [tagName, setTagName] = useState("");
@@ -277,10 +278,11 @@ function AdminPage() {
     function onEpisodeSeasonChange(event){ setEpisodeSeason(event.target.value); }
     let [episodeNumber, setEpisodeNumber] = useState("");
     function onEpisodeNumberChange(event){ setEpisodeNumber(event.target.value); }
+    let [episodeParentOptions, setEpisodeParentOptions] = useState([]);
     let [episodeParent, setEpisodeParent] = useState("");
-    function onEpisodeParentChange(event){ setEpisodeParent(event.target.value); }
-    let [episodeType, setEpisodeType] = useState("");
-    function onEpisodeTypeChange(event){ setEpisodeType(event.target.value); }
+    function onEpisodeParentChange(event){ setEpisodeParent(event); }
+    let [seasonEpisodeString, setSeasonEpisodeString] = useState("");
+    function onSeasonEpisodeString(event){ setSeasonEpisodeString(event.target.value); }
     let [episodeDate, setEpisodeDate] = useState("");
     function onEpisodeDateChange(event){ setEpisodeDate(event.target.value); }
     let [episodePicture, setEpisodePicture] = useState("");
@@ -289,6 +291,33 @@ function AdminPage() {
         tryAddEpisode();
     }
     async function tryAddEpisode(){
+                //const tags =[]
+                const parent = {
+                    _id: episodeParent._id,
+                    name: episodeParent.name,
+                    seasonEpisode: "S#" + episodeSeason+"-E#" + episodeNumber
+                }
+                const media = {
+                    name: episodeName,
+                    type: "Episode",
+                    picture: episodePicture,
+                    description: episodeDesc,
+                    airedDate: episodeDate,
+                    parent: parent,
+                }
+                Utility.fetchData("http://localhost:3000/api/media","POST", media)
+            .then(data => {
+                console.log(data)
+            })
+    }
+    function getAllTvShows(){
+        Utility.fetchData("http://localhost:3000/api/media?skip=0&limit=100&type=tvshow")
+        .then(data =>{
+            setEpisodeParentOptions(data)
+        })
+    }
+    function handleParentChange(){
+        
     }
     //#endregion
 
@@ -357,6 +386,7 @@ function AdminPage() {
                     <Typography variant="h5">Add Show/Movie</Typography>
                     <TextField label="Title" value={mediaName} onChange={onMediaNameChange}></TextField>
                     <TextField label="Description" value={mediaDesc} onChange={onMediaDescChange}></TextField>
+                    <Typography>Type :</Typography>
                     <SelectComponent
                         label={"Type"}
                         options={typeOptions.current}
@@ -378,13 +408,13 @@ function AdminPage() {
                     <TextField label="Description" value={episodeDesc} onChange={onEpisodeDescChange}></TextField>
                     <TextField label="Season" type={"number"} value={episodeSeason} onChange={onEpisodeSeasonChange}></TextField>
                     <TextField label="Episode" type={"number"} value={episodeNumber} onChange={onEpisodeNumberChange}></TextField>
+                    <Typography>Parent:</Typography>
                     <SelectComponent
-                        label={"Type"}
-                        options={typeOptions.current}
-                        onChange={handleTypeChange}
-                        />
+                        label={"Parent"}
+                        options={episodeParentOptions}
+                        onChange={onEpisodeParentChange}
+                        />                
                     <TextField label="" type={"date"} value={episodeDate} onChange={onEpisodeDateChange}></TextField>
-                    <TextField label="Parent (select)" value={episodeParent} onChange={onEpisodeParentChange}></TextField>
                     <TextField label="Picture URL" value={episodePicture} onChange={onEpisodePictureChange}></TextField>
                     <Box className="flex-right">
                         <Button type="contained" onClick={addEpisodeClick}>Add</Button>
