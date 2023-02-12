@@ -24,7 +24,7 @@ const _mw = require("../helpers/middlewares")
     
 //Media
 router.route("/")
-    // .get(_media.getAllMedia)
+    .get(_media.getAllMedia)
     .post(_media.createMedia)
 
 router.route("/:mediaId")

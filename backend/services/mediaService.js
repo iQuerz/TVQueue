@@ -16,33 +16,30 @@ const _util = require("../helpers/utility")
 //==============================================================================================================================================//
 //#region Media
 
-//@GET: "/api/accounts?skip=_NUM_&limit=_NUM_&name=_TXT_&email=_TXT_&roles=admin&roles=user...""
+//@GET: "/api/media?skip=_NUM_&limit=_NUM_&name=_TXT_&type=_ENUM_"
 //@Access: PROTECTED
 //@Roles: ADMIN
-//@Description: Povlaci sve account-ove
-// const getAllMedia = asyncHandler( async (req, res) => {
+//@Description: Povlaci sve account-ove  
+const getAllMedia = asyncHandler( async (req, res) => {
+    let { type, name, fromDate, toDate, order, skip, limit} = req.query
 
-//     // const skip = parseInt((req.query.skip) ?? 0)
-//     // const limit = parseInt((req.query.limit) ?? 10)
+    let query = {}
+    
+    if (name) query.searchName = {$regex: "^"+name.toLowerCase()}
+    if (type) query.type = _enum.media.type[type]
 
-//     // const obj = _obj.filter(req.query, "name", "email", "roles")
-//     // let query = (obj.name || obj.email) ? {"$or": []} : {}
+    fromDate = (fromDate) ? new Date(fromDate) : new Date("1900")
+    toDate = (toDate) ? new Date(toDate) : new Date("2100")
+    query["$and"] = [{ "airedDate": {"$gte": fromDate}}, { "airedDate": {"$lte": toDate}}]
 
-//     // if (obj.name) query["$or"].push({"name": {$regex: obj.name, $options: "i"}})
-//     // if (obj.email) query["$or"].push({"email": {$regex: obj.email, $options: "i"}})
+    order = parseInt((order === "asc") ? 1 : -1)
+    skip = parseInt((skip) ?? 0)
+    limit = parseInt((limit) ?? 10)
 
-//     // if(obj.roles) {
-//     //     if(!(obj.roles instanceof Array)) obj.roles = [obj.roles]
+    const result = await _mediaContext.find(query, _obj.one.Id.Name.Picture.Type.AiredDate.Rating.result).sort({ airedDate: order }).skip(skip).limit(limit).lean()
 
-//     //     query["$and"]  = obj.roles.filter(roleValid => _enum.roles.type[roleValid.toLowerCase()]).map(role => ({ [`roles.${[role.toLowerCase()]}`]: true  }) )
-        
-//     //     if(query["$or"]) query = { "$and": [ {$or: query["$or"]}, {$and: query["$and"]} ] }
-//     // }
-//     // console.log(query)
-//     // const allAccountsQuery = await _accountContext.find(query, _obj.one.Id.Email.Name.Picture.Roles.FollowingTags.result).skip(skip).limit(limit).lean()
-
-//     res.status(_code.ok).json(_msg.success)
-// })
+    res.status(_code.ok).json(result)
+})
 
 //@POST: "/api/media" 
 //@Access: PROTECTED
@@ -208,35 +205,6 @@ const addReview = asyncHandler( async (req, res) => {
 
 })
 
-// //@DELETE: "/api/accounts/_ACCOUNT_ID_/tags" 
-// //@Access: PROTECTED
-// //@Roles: ADMIN
-// //@Description: Brise listu tagova [tags] u account
-// const removeFollowingTags = asyncHandler( async (req, res) => {
-//     const accountId = req.params.accountId
-//     const removeTags = req.body
-
-//     const removedTags = await _accountContext.findOneAndUpdate({ _id: accountId }, { $pull: { "followingTags": { _id: { $in: removeTags }}}}, { new: true })
-
-//     res.status((removedTags) ? _code.ok : _code.badRequest).json(removedTags ?? _msg.accountTagsNotFound)
-// })
-
-// //@PATCH: "/api/accounts/_ACCOUNT_ID_/tags" 
-// //@Access: PROTECTED
-// //@Roles: ADMIN
-// //@Description: Koristi se za updatovanje taga kad se update-uje sam tag dokument
-// const updateFollowingTag = asyncHandler(async (req, res) => {
-//     const accountId = req.params.accountId
-//     const tag = req.body
-
-//     if (!tag._id || !tag.name) _mw.error.send(res, _code.badRequest, _msg.wrongIdNameTag)
-
-//     const result = await _accountContext.updateOne({ _id: accountId, "followingTags._id": tag._id }, { $set: { "followingTags.$.name": tag.name }})
-    
-//     if (result.modifiedCount === 0) _mw.error.send(res, _code.notFound, _msg.updatedAccountTagFailed)
-
-//     res.status(_code.ok).json(_msg.updatedAccountTag)
-// })
 //#endregion
 //==============================================================================================================================================//
 //#region Media + Episodes
@@ -272,7 +240,7 @@ const connectMediaToTags = asyncHandler(async (req, res) => {
 
 module.exports = {
     //Media
-    // getAllMedia,
+    getAllMedia,
     getMedia,
     createMedia,
 

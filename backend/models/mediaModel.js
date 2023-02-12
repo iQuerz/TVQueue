@@ -6,7 +6,11 @@ const _enum = require("../helpers/enums")
 
 //Schema definition
 const mediaSchema = mongoose.Schema({
-    name: { type: String, index: true },
+    name: String,
+    searchName: { 
+        type: String, 
+        select: false,
+    },
     type: { type: String, enum: _enum.toValueList(_enum.media) },
     picture: String,
     description: String,
@@ -79,9 +83,14 @@ const mediaSchema = mongoose.Schema({
 })
 
 //Indexes
+//Compound index
+mediaSchema.index( {searchName: 1}, {type: 1}) 
 
 //Pre middleware
-
+mediaSchema.pre('save', function(next) {
+    this.searchName = this.name.toLowerCase()
+    next()
+})
 //Post middleware
 
 //Helper functions
