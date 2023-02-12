@@ -195,7 +195,7 @@ function MediaCarousel(props) {
         event.target.classList.add("carousel-selected")
     }
     function getAllTags(){
-        Utility.fetchData("http://localhost:3000/api/tags")
+        Utility.fetchData("http://localhost:3000/our-tags")
         .then(data => {
             setCarouselOptions(data)
             fetchTag(data[0]._id)
