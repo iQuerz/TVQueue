@@ -215,7 +215,7 @@ function AdminPage() {
     function onMediaDateChange(event){ setMediaDate(event.target.value); }
     let [mediaPicture, setMediaPicture] = useState("");
     function onMediaPictureChange(event){ setMediaPicture(event.target.value); }
-    const typeOptions = useRef([{name:"Movie"},{name :"Tv Show"}]);
+    const typeOptions = useRef([{name:"Movie"},{name :"TV Show"}]);
     const [mediaType,setMediaType] = useState("");
 
     const [allTags,setAllTags] = useState([]);
