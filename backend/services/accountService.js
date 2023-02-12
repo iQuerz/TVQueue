@@ -248,24 +248,6 @@ const addMediaToPlaylist = asyncHandler( async (req, res) => {
         }}]
     )
 
-    // const result = await _accountContext.aggregate([
-    //     { $match: {
-    //     }},
-    //     { $addFields: {
-    //         "playlists": {
-    //             $filter: {
-    //                 input: "$playlists",
-    //                 as: "media",
-    //                 cond: { $ne: [ "$$media.mediaRef", media._id]}
-    //             }
-    //         }
-    //     }},
-    //     { $addFields: {
-    //         "playlists": {
-    //             $concatArrays: [ { $ifNull: ["$playlists", []]}, [ { name: playlistName, mediaRef: media._id, mediaName: media.name, mediaPicture: media.picture } ]]
-    //         }
-    //     }}
-    // ])
     const success = result
     console.log(result)
     res.status((success) ? _code.ok : _code.badRequest).json(success ? _msg.success : _msg.failed)
