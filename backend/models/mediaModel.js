@@ -88,7 +88,10 @@ mediaSchema.index( {searchName: 1}, {type: 1})
 
 //Pre middleware
 mediaSchema.pre('save', function(next) {
-    this.searchName = this.name.toLowerCase()
+    if(!this.searchName && this.name) {
+        console.log("aeeee")
+        this.searchName = this.name.toLowerCase()
+    }
     next()
 })
 //Post middleware

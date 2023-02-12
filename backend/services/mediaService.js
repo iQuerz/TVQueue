@@ -16,12 +16,12 @@ const _util = require("../helpers/utility")
 //==============================================================================================================================================//
 //#region Media
 
-//@GET: "/api/media?skip=_NUM_&limit=_NUM_&name=_TXT_&type=_ENUM_"
+//@GET: "/api/media?skip=_NUM_&limit=_NUM_&name=_TXT_&type=_ENUM_&sort=_RATING_OR_DATE_"
 //@Access: PROTECTED
 //@Roles: ADMIN
 //@Description: Povlaci sve account-ove  
 const getAllMedia = asyncHandler( async (req, res) => {
-    let { type, name, fromDate, toDate, order, skip, limit} = req.query
+    let { type, name, fromDate, toDate, order, skip, limit, sort} = req.query
 
     let query = {}
     
@@ -35,8 +35,10 @@ const getAllMedia = asyncHandler( async (req, res) => {
     order = parseInt((order === "asc") ? 1 : -1)
     skip = parseInt((skip) ?? 0)
     limit = parseInt((limit) ?? 10)
+    
+    sort = { [((sort) ?? "airedDate")]: order}
 
-    const result = await _mediaContext.find(query, _obj.one.Id.Name.Picture.Type.AiredDate.Rating.result).sort({ airedDate: order }).skip(skip).limit(limit).lean()
+    const result = await _mediaContext.find(query, _obj.one.Id.Name.Picture.Type.AiredDate.Rating.result).sort(sort).skip(skip).limit(limit).lean()
 
     res.status(_code.ok).json(result)
 })
