@@ -203,12 +203,12 @@ const updateCustomMediaInTag = asyncHandler(async (req, res) => {
     if (customMedia.rating) objQuery["mediaEmbedded.$.rating"] = customMedia.rating
     if (customMedia.airedDate) objQuery["mediaEmbedded.$.airedDate"] = customMedia.airedDate
 
-    const result = await _tagContext.updateOne({ _id: tagId, "mediaEmbedded._id": customMedia._id}, { $set: objQuery}, validator)
+    let result = await _tagContext.updateOne({ _id: tagId, "mediaEmbedded._id": customMedia._id}, { $set: objQuery}, validator)
 
     if (result.modifiedCount === 0)
         _mw.error.send(res, _code.notFound, _msg.mediaInTagNotFound)
 
-    res.status(_code.ok).json(_msg.updatedMediaInTag)
+    res.status(_code.ok).json(_msg.success)
 })
 
 //@DELETE: "/api/tags/:tagId/media/:mediaId" 

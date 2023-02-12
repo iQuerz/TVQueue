@@ -194,7 +194,7 @@ const addMediaToPlaylist = asyncHandler( async (req, res) => {
 
     const obj = { playlists: { name: playlistName, mediaRef: media._id, mediaName: media.name, mediaPicture: media.picture } }
 
-    const result = await _accountContext.updateOne({ _id: accountId, "playlists.mediaRef": { $nin: [media._id]}}, { $push: obj })
+    const result = await _accountContext.updateOne({ _id: accountId }, { $set: obj }, {upsert: true})
     const success = result.modifiedCount !== 0
 
     res.status((success) ? _code.ok : _code.badRequest).json(success ? _msg.success : _msg.failed)
@@ -210,7 +210,7 @@ const deleteMediaFromPlaylist = asyncHandler( async (req, res) => {
     const mediaId = req.params.mediaId
 
     const result = await _accountContext.updateOne({ _id: accountId, "playlists.name": playlistName}, { $pull: { "playlists": { mediaRef: mediaId } } })
-    // const bruh = await _accountContext.findById( {_id: accountId}, {playlists: 1} ).populate("playlists.mediaRef")
+   
     res.status((result) ? _code.ok : _code.badRequest).json(result ? _msg.success : _msg.failed)
 })
 //#endregion
