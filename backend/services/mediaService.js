@@ -87,8 +87,7 @@ const getMedia = asyncHandler(async (req, res) => {
     const skip = parseInt((req.query.skip) ?? 0)
     const limit = parseInt((req.query.limit) ?? 10)
 
-    const includeFields = _obj.NoTimestamps.__v.result
-    const media = await _mediaContext.findOne({ _id: mediaId }, includeFields ).lean()
+    const media = await _mediaContext.findOne({ _id: mediaId }, {} ).lean()
 
     res.status((media) ? _code.ok : _code.noContent).json(media)
 })
@@ -103,31 +102,9 @@ const deleteMedia = asyncHandler(async (req, res) => {
     const removedMedia = await _mediaContext.findOneAndDelete({ _id: mediaId })
 
     if (removedMedia.parent) await _mediaContext.updateOne({ _id: removedMedia.parent._id}, { $pull: { "episodes": { _id: mediaId } } })
-
     if (removedMedia.tags?.length > 0) bulkWriteTags(mediaId, removedMedia.tags)
-    // {
-    //     const bulkOperation = removedMedia.tags.map(tag => { 
-    //         return { "updateOne" : { "filter" : { "_id" : tag._id }, "update" : { "$pull" : { "mediaEmbedded": {_id: mediaId} }, "$inc": { "mediaCount": -1 } } } }
-    //     })
-    //     await _tagContext.bulkWrite(bulkOperation)
-    // }
-
     if (removedMedia.reviews?.length > 0) bulkWriteReviews(mediaId, removedMedia.reviews)
-    // {
-    //     const bulkOperation = removedMedia.reviews.map(account => { 
-    //         console.log(account)
-    //         return { "updateOne" : { "filter" : { "_id" : account._userId }, "update" : { "$pull" : { "reviews": { _mediaId: mediaId } } } } }
-    //     })
-    //     await _accountContext.bulkWrite(bulkOperation)
-    // }
-
     if (removedMedia.episodes?.length > 0) bulkWriteEpisodes(mediaId, removedMedia.episodes)
-    // {
-    //     const bulkOperation = removedMedia.episodes.map(episode => { 
-    //         return { "updateOne" : { "filter" : { "_id" : episode._id }, "update" : { "$unset" : { "parent": { _id: mediaId } } } } }
-    //     })
-    //     await _mediaContext.bulkWrite(bulkOperation)
-    // }
 
     res.status(_code.noContent).json(removedMedia)
 })
@@ -225,7 +202,7 @@ const addReview = asyncHandler( async (req, res) => {
     //Tag update
     if (!media) throw _mw.error.send(res, _code.badRequest, _msg.failed)
 
-    media.avgRating = (media.avgRating) ? parseFloat(((media.avgRating * (media.reviewCount-1)) + review.rating) / media.reviewCount) : review.rating
+    media.avgRating = _util.average(media.avgRating, media.reviewCount, review.rating)
     media.rating = _util.trendiness(media.avgRating, media.reviewCount)
     media.save()
 
@@ -239,7 +216,53 @@ const addReview = asyncHandler( async (req, res) => {
     await _accountContext.findByIdAndUpdate({ _id: review._userId }, { $push: { "reviews": { rating: review.rating, comment: review.comment, _mediaId: mediaId } }})
     res.status(_code.ok).json(_msg.success)
 
-    //Account update
+})
+
+//@DELETE: "/api/media/_MEDIA_ID_/reviews" 
+//@Access: PROTECTED
+//@Roles: ADMIN
+//@Description: Dodaje listu tagova [tags] u account
+const deleteReview = asyncHandler( async (req, res) => {
+    const mediaId = req.params.mediaId
+    const userId = [req.myAccount._id]
+
+    const media = await _mediaContext.findOneAndUpdate({ 
+        _id: mediaId,
+        "reviews._userId": { $in: userId }
+    },
+    { 
+        $pull: { reviews: { _userId: userId} },
+        "$inc": { "reviewCount": -1 } 
+    }, 
+    {   
+        projection: {
+            _id: 1,
+            rating: 1,
+            avgRating: 1,
+            reviewCount: 1,
+            tags: 1,
+            reviews: { 
+                $elemMatch: { _userId: userId}
+            }
+        },
+    })
+    //Tag update
+    if (!media) throw _mw.error.send(res, _code.badRequest, _msg.failed)
+    console.log(media)
+    media.avgRating = _util.average(media.avgRating, media.reviewCount, (-media.reviews[0].rating))
+    console.log(media.avgRating)
+    // media.rating = _util.trendiness(media.avgRating, media.reviewCount)
+    // media.save()
+
+    // req.params.tagId = media.tags
+    // req.body.rating = media.rating
+    // const tagIds = media.tags.map(e => mongoose.Types.ObjectId(e._id))
+    
+    // await _tagContext.updateMany({ _id: { $in: tagIds }, "mediaEmbedded._id": media._id}, { $set: { "mediaEmbedded.$.rating": media.rating}})
+    
+    // //Account update
+    // await _accountContext.findByIdAndUpdate({ _id: review._userId }, { $push: { "reviews": { rating: review.rating, comment: review.comment, _mediaId: mediaId } }})
+    res.status(_code.ok).json(media)
 
 })
 
@@ -318,6 +341,7 @@ module.exports = {
 
     //Meda + Reviews
     addReview,
+    deleteReview,
 
     //Media + Tags
     connectMediaToTags
