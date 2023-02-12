@@ -45,12 +45,12 @@ const mediaSchema = mongoose.Schema({
     
     reviews: {
         type: [{
-            _id: { type: mongoose.Types.ObjectId },
             _userId: { type: mongoose.Types.ObjectId },
             name: String,
             rating: Number,
             comment: String       
         }],
+        _id: false,
         default: undefined
     },
     episodes: {

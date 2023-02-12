@@ -44,6 +44,7 @@ const accountSchema = mongoose.Schema({
             comment: String,
             _mediaId: { type: mongoose.Types.ObjectId, ref: "Media" }        
         }],
+        _id: false,
         default: undefined
     },
 

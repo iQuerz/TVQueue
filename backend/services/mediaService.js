@@ -101,12 +101,14 @@ const deleteMedia = asyncHandler(async (req, res) => {
     const mediaId = req.params.mediaId
     //hesus, this what we get for using "embedded" type
     const removedMedia = await _mediaContext.findOneAndDelete({ _id: mediaId })
-    console.log(removedMedia)
+
     if (removedMedia.parent) 
         await _mediaContext.updateOne({ _id: removedMedia.parent._id}, { $pull: { "episodes": { _id: mediaId } } })
 
     if (removedMedia.tags) {
+        console.log("Usao sam")
         const bulkOperation = removedMedia.tags.map(tag => { 
+            console.log(tag)
             return { "updateOne" : { "filter" : { "_id" : tag._id }, "update" : { "$pull" : { "mediaEmbedded": {_id: mediaId} }, "$inc": { "mediaCount": -1 } } } }
         })
         await _tagContext.bulkWrite(bulkOperation)
@@ -114,16 +116,17 @@ const deleteMedia = asyncHandler(async (req, res) => {
 
     if (removedMedia.reviews) {
         const bulkOperation = removedMedia.reviews.map(account => { 
-            return { "updateOne" : { "filter" : { "_id" : account._id }, "update" : { "$pull" : { "reviews": { _mediaId: mediaId } } } } }
+            console.log(account)
+            return { "updateOne" : { "filter" : { "_id" : account._userId }, "update" : { "$pull" : { "reviews": { _mediaId: mediaId } } } } }
         })
         await _accountContext.bulkWrite(bulkOperation)
     }
 
     if (removedMedia.episodes) {
         const bulkOperation = removedMedia.episodes.map(episode => { 
-            return { "updateOne" : { "filter" : { "_id" : episode._id }, "update" : { "$pull" : { "parent": { _id: mediaId } } } } }
+            return { "updateOne" : { "filter" : { "_id" : episode._id }, "update" : { "$unset" : { "parent": { _id: mediaId } } } } }
         })
-        await _accountContext.bulkWrite(bulkOperation)
+        await _mediaContext.bulkWrite(bulkOperation)
     }
 
     res.status(_code.noContent).json(removedMedia)
@@ -236,7 +239,7 @@ const addReview = asyncHandler( async (req, res) => {
     await _tagContext.updateMany({ _id: { $in: tagIds }, "mediaEmbedded._id": media._id}, { $set: { "mediaEmbedded.$.rating": media.rating}})
     
     //Account update
-    await _accountContext.findByIdAndUpdate({ _id: review._userId }, { $push: { "reviews": { _id: review._userId, rating: review.rating, comment: review.comment, _mediaId: mediaId } }})
+    await _accountContext.findByIdAndUpdate({ _id: review._userId }, { $push: { "reviews": { rating: review.rating, comment: review.comment, _mediaId: mediaId } }})
     res.status(_code.ok).json(_msg.success)
 
     //Account update
