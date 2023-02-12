@@ -178,7 +178,6 @@ const addReview = asyncHandler( async (req, res) => {
     review._userId = [req.myAccount._id]
     review.name = req.myAccount.name
 
-    console.log(review)
     if (!review._userId) _mw.error.send(res, _code.forbidden, _msg.notLoggedIn)
 
     const media = await _mediaContext.findOneAndUpdate({ 
@@ -248,20 +247,20 @@ const deleteReview = asyncHandler( async (req, res) => {
     })
     //Tag update
     if (!media) throw _mw.error.send(res, _code.badRequest, _msg.failed)
-    console.log(media)
-    media.avgRating = _util.average(media.avgRating, media.reviewCount, (-media.reviews[0].rating))
-    console.log(media.avgRating)
-    // media.rating = _util.trendiness(media.avgRating, media.reviewCount)
-    // media.save()
 
-    // req.params.tagId = media.tags
-    // req.body.rating = media.rating
-    // const tagIds = media.tags.map(e => mongoose.Types.ObjectId(e._id))
+    media.avgRating = _util.average(media.avgRating, media.reviewCount, (-media.reviews[0].rating))
+    media.rating = _util.trendiness(media.avgRating, media.reviewCount)
+
+    media.save()
+
+    req.params.tagId = media.tags
+    req.body.rating = media.rating
+    const tagIds = media.tags.map(e => mongoose.Types.ObjectId(e._id))
     
-    // await _tagContext.updateMany({ _id: { $in: tagIds }, "mediaEmbedded._id": media._id}, { $set: { "mediaEmbedded.$.rating": media.rating}})
+    await _tagContext.updateMany({ _id: { $in: tagIds }, "mediaEmbedded._id": media._id}, { $set: { "mediaEmbedded.$.rating": media.rating}})
     
-    // //Account update
-    // await _accountContext.findByIdAndUpdate({ _id: review._userId }, { $push: { "reviews": { rating: review.rating, comment: review.comment, _mediaId: mediaId } }})
+    //Account update
+    await _accountContext.findByIdAndUpdate({ _id: userId }, { $pull: { "reviews": { _mediaId: mediaId } }})
     res.status(_code.ok).json(media)
 
 })

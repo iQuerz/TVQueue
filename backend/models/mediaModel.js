@@ -42,7 +42,6 @@ const mediaSchema = mongoose.Schema({
         default: undefined
     },
     
-    
     reviews: {
         type: [{
             _userId: { type: mongoose.Types.ObjectId },
