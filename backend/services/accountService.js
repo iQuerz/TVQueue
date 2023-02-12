@@ -183,6 +183,44 @@ const getAllPlaylists = asyncHandler( async (req, res) => {
     res.status(_code.ok).json(result)
 })
 
+//@POST: "/api/accounts/_ACCOUNT_ID_/playlists/_PLAYLIST_NAME_?skip=&limit="
+//@Access: PUBLIC
+//@Roles: ADMIN
+//@Description: Vraca specificnu listu
+const getPlaylistByName = asyncHandler( async (req, res) => {
+    const accountId = req.params.accountId
+    const playlistName = req.params.playlist
+
+    const skip = parseInt((req.query.skip) ?? 0)
+    const limit = parseInt((req.query.limit) ?? 10)
+
+    const result = (await _accountContext.aggregate([
+        { $match: { 
+            _id: accountId,
+        }},
+        { $project: {
+            _id: 0,
+            [playlistName]: { 
+                $filter: {
+                    input: "$playlists",
+                    as: "playlist",
+                    cond: {$eq: ["$$playlist.name", playlistName]},
+                    "limit": limit
+                }            
+            }
+        }},
+        { $project: {
+            _id: 0,
+            [playlistName]: { $slice: ["$"+[playlistName], skip, limit] }
+            }
+        },
+    ],
+    { $limit: 1 }    
+    ))[0]
+
+    res.status((result) ? _code.ok : _code.badRequest).json(result)
+})
+
 //@POST: "/api/accounts/_ACCOUNT_ID_/playlists/_PLAYLIST_NAME_"
 //@Access: PUBLIC
 //@Roles: ADMIN
@@ -251,6 +289,7 @@ module.exports = {
 
     //Accounts + Playlists
     getAllPlaylists,
+    getPlaylistByName,
     addMediaToPlaylist,
     deleteMediaFromPlaylist,
 

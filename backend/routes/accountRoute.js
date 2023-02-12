@@ -21,6 +21,7 @@ router.route("/me/tags")
     .delete(_mw.access.protect, _account.getMe, _account.removeFollowingTags)
 
 router.route("/me/playlists/:playlist")
+    .get(_mw.access.protect, _account.getMe, _account.getPlaylistByName)
     .post(_mw.access.protect, _account.getMe, _account.addMediaToPlaylist)
 
 router.route("/me/playlists/:playlist/:mediaId")
@@ -48,6 +49,7 @@ router.route("/:accountId/tags")
 
 //Accounts + Playlists
 router.route("/:accountId/playlists/:playlist")
+    .get(_account.getPlaylistByName)
     .post(_account.addMediaToPlaylist)
 
 router.route("/:accountId/playlists/:playlist/:mediaId")
