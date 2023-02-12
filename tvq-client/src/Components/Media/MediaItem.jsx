@@ -47,10 +47,7 @@ function MediaItem(props) {
         .then(data => {
             if(data.status == 400)
             {
-                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watchlater/" + props.media._id,"DELETE")
-                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watching/" + props.media._id,"DELETE")
-                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watched/" + props.media._id,"DELETE")
-                .then(Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watchlater","POST",body))
+                console.log("Already in play list")
             }
             if(data.status == 403)
                 navigate("/login")
@@ -61,11 +58,7 @@ function MediaItem(props) {
         .then(data => {
             if(data.status == 400)
             {
-                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watchlater/" + props.media._id,"DELETE")
-                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watching/" + props.media._id,"DELETE")
-                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watched/" + props.media._id,"DELETE")
-                .then(Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watching","POST",body))
-                
+                console.log("Already in play list")
             }
             if(data.status == 403)
                 navigate("/login")
@@ -76,10 +69,7 @@ function MediaItem(props) {
         .then(data => {
             if(data.status == 400)
             {
-                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watchlater/" + props.media._id,"DELETE")
-                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watching/" + props.media._id,"DELETE")
-                Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watched/" + props.media._id,"DELETE")
-                .then(Utility.fetchData("http://localhost:3000/api/accounts/me/playlists/watched","POST",body))
+                console.log("Already in play list")
             }
         if(data.status == 403)
             navigate("/login")
@@ -108,7 +98,7 @@ function MediaItem(props) {
                 </CardContent>
 
                 <Box className="flex-down" height={"4.5em"}>
-                    <Rating name="read-only" value={props.media.rating} title={props.media.rating} readOnly/>
+                    <Rating name="read-only"  value={props.media.rating} title={props.media.rating}  max={10} readOnly/>
                     <CardActions className="flex-right">         
                         <Button onClick={showMore} size="medium">More</Button>
                         <Button size="medium" onClick={handleOpenMenu}>Add to</Button>

@@ -16,33 +16,32 @@ const _util = require("../helpers/utility")
 //==============================================================================================================================================//
 //#region Media
 
-//@GET: "/api/accounts?skip=_NUM_&limit=_NUM_&name=_TXT_&email=_TXT_&roles=admin&roles=user...""
+//@GET: "/api/media?skip=_NUM_&limit=_NUM_&name=_TXT_&type=_ENUM_&sort=_RATING_OR_DATE_"
 //@Access: PROTECTED
 //@Roles: ADMIN
-//@Description: Povlaci sve account-ove
-// const getAllMedia = asyncHandler( async (req, res) => {
+//@Description: Povlaci sve account-ove  
+const getAllMedia = asyncHandler( async (req, res) => {
+    let { type, name, fromDate, toDate, order, skip, limit, sort} = req.query
 
-//     // const skip = parseInt((req.query.skip) ?? 0)
-//     // const limit = parseInt((req.query.limit) ?? 10)
+    let query = {}
+    
+    if (name) query.searchName = {$regex: "^"+name.toLowerCase()}
+    if (type) query.type = _enum.media.type[type]
 
-//     // const obj = _obj.filter(req.query, "name", "email", "roles")
-//     // let query = (obj.name || obj.email) ? {"$or": []} : {}
+    fromDate = (fromDate) ? new Date(fromDate) : new Date("1900")
+    toDate = (toDate) ? new Date(toDate) : new Date("2100")
+    query["$and"] = [{ "airedDate": {"$gte": fromDate}}, { "airedDate": {"$lte": toDate}}]
 
-//     // if (obj.name) query["$or"].push({"name": {$regex: obj.name, $options: "i"}})
-//     // if (obj.email) query["$or"].push({"email": {$regex: obj.email, $options: "i"}})
+    order = parseInt((order === "asc") ? 1 : -1)
+    skip = parseInt((skip) ?? 0)
+    limit = parseInt((limit) ?? 10)
+    
+    sort = { [((sort) ?? "airedDate")]: order}
 
-//     // if(obj.roles) {
-//     //     if(!(obj.roles instanceof Array)) obj.roles = [obj.roles]
+    const result = await _mediaContext.find(query, _obj.one.Id.Name.Picture.Type.AiredDate.Rating.result).sort(sort).skip(skip).limit(limit).lean()
 
-//     //     query["$and"]  = obj.roles.filter(roleValid => _enum.roles.type[roleValid.toLowerCase()]).map(role => ({ [`roles.${[role.toLowerCase()]}`]: true  }) )
-        
-//     //     if(query["$or"]) query = { "$and": [ {$or: query["$or"]}, {$and: query["$and"]} ] }
-//     // }
-//     // console.log(query)
-//     // const allAccountsQuery = await _accountContext.find(query, _obj.one.Id.Email.Name.Picture.Roles.FollowingTags.result).skip(skip).limit(limit).lean()
-
-//     res.status(_code.ok).json(_msg.success)
-// })
+    res.status(_code.ok).json(result)
+})
 
 //@POST: "/api/media" 
 //@Access: PROTECTED
@@ -54,7 +53,7 @@ const createMedia = asyncHandler(async (req, res) => {
     media._id = mongoose.Types.ObjectId();
 
     const createdMedia = await _mediaContext.create(media)
-
+    console.log(createdMedia.tags)
     if(media.parent) {
         req.params.parentId = media.parent._id
 
@@ -79,7 +78,7 @@ const createMedia = asyncHandler(async (req, res) => {
     res.status(_code.created).json(media)
 })
 
-//@GET: "/api/accounts/:mediaId?skip=_NUM_&limit=_NUM_"
+//@GET: "/api/media/:mediaId"
 //@Access: PUBLIC
 //@Roles: ALL
 //@Description: Povlaci media
@@ -88,42 +87,55 @@ const getMedia = asyncHandler(async (req, res) => {
     const skip = parseInt((req.query.skip) ?? 0)
     const limit = parseInt((req.query.limit) ?? 10)
 
-    const includeFields = _obj.one.Name.Type.Picture.Description.AiredDate.Rating.Parent.Reviews(skip, limit).Participated().Tags().Episodes().result
-    const media = await _mediaContext.findOne({ _id: mediaId }, includeFields ).lean()
+    const media = await _mediaContext.findOne({ _id: mediaId }, {} ).lean()
 
     res.status((media) ? _code.ok : _code.noContent).json(media)
 })
 
-// //@PATCH: "/api/accounts/:accountId"
-// //@Access: PROTECTED
-// //@Roles: ADMIN
-// //@Description: Updateuje samo deo prosledjen u body
-// const patchAccount = asyncHandler(async (req, res) => {
-//     const accountId = req.params.accountId
+//@DELETE: "/api/media/:mediaId" 
+//@Access: PROTECTED
+//@Roles: ADMIN
+//@Description: Koristi se za kreiranje media
+const deleteMedia = asyncHandler(async (req, res) => {
+    const mediaId = req.params.mediaId
+    //hesus, this what we get for using "embedded" type
+    const removedMedia = await _mediaContext.findOneAndDelete({ _id: mediaId })
 
-//     if(req.body.playlists) throw new Error(_msg.forbiddenPlaylist)
-//     if(req.body.reviews) throw new Error(_msg.forbiddenReviews)
-//     if(req.body.followingTags) throw new Error(_msg.forbiddenFollowingTags)
- 
-//     const updatedAccount = await _accountContext.findByIdAndUpdate({ _id: accountId }, req.body, { new: true })
+    if (removedMedia.parent) await _mediaContext.updateOne({ _id: removedMedia.parent._id}, { $pull: { "episodes": { _id: mediaId } } })
+    if (removedMedia.tags?.length > 0) bulkWriteTags(mediaId, removedMedia.tags)
+    if (removedMedia.reviews?.length > 0) bulkWriteReviews(mediaId, removedMedia.reviews)
+    if (removedMedia.episodes?.length > 0) bulkWriteEpisodes(mediaId, removedMedia.episodes)
+
+    res.status(_code.noContent).json(removedMedia)
+})
+
+// @PATCH: "/api/media/:mediaId"
+// @Access: PROTECTED
+// @Roles: ADMIN
+// @Description: Updateuje samo deo prosledjen u body
+const patchMedia = asyncHandler(async (req, res) => {
+    const mediaId = req.params.mediaId
+    const patch = req.body
+
+    if(patch.participated || patch.reviews || patch.episodes || patch.tags ) 
+        throw new Error(_msg.forbidden)
+
+    const oldMedia = await _mediaContext.findOneAndUpdate({ _id: mediaId }, req.body)
     
-//     res.status((updatedAccount) ? _code.ok : _code.noContent).json(_msg.updatedAccount)
-// })
+    console.log(patch)
+    console.log(oldMedia)
 
-// //@DELETE: "/api/accounts/:accountId"
-// //@Access: PROTECTED
-// //@Roles: ADMIN
-// //@Description: Brise account
-// const deleteAccount = asyncHandler(async (req, res) => {
-//     const accountId = req.params.accountId
-
-//     const exist = await _accountContext.exists({ _id: accountId })
-//     if(!exist) _mw.error.send(res, _code.notFound, _msg.accountNotFound)
-
-//     const deletedAccount = await _accountContext.findByIdAndDelete({ _id: accountId })
-    
-//     res.status((deletedAccount) ? _code.ok : _code.noContent).json(_msg.deletedAccount)
-// })
+    if (patch.parent) {
+        const child = {
+            name: patch.parent.name ?? oldMedia.parent.name ,
+            _id: mediaId, 
+            seasonEpisode: patch.parent.seasonEpisode ?? oldMedia.parent.seasonEpisode
+        }
+        await _mediaContext.updateOne({ _id: patch.parent._id}, { $push: { "episodes": child } })
+        await _mediaContext.updateOne({ _id: oldMedia.parent._id}, { $pull: { "episodes": { _id: mediaId } } })
+    }
+    res.status((oldMedia) ? _code.ok : _code.noContent).json(_msg.success)
+})
 
 
 //#endregion
@@ -163,15 +175,15 @@ const connectChildToParent = asyncHandler(async (req, res) => {
 const addReview = asyncHandler( async (req, res) => {
     const mediaId = req.params.mediaId
     const review = _obj.filter(req.body, "rating", "comment")
-    review.userId = req.myAccount._id
+    review._userId = [req.myAccount._id]
     review.name = req.myAccount.name
 
     console.log(review)
-    if (!review.userId) _mw.send(res, _code.forbidden, _msg.notLoggedIn)
+    if (!review._userId) _mw.error.send(res, _code.forbidden, _msg.notLoggedIn)
 
-    const addedReview = await _mediaContext.findOneAndUpdate({ 
+    const media = await _mediaContext.findOneAndUpdate({ 
         _id: mediaId,
-        "reviews._userId": { $nin: [review.userId] }
+        "reviews._userId": { $nin: review._userId }
     },
     { 
         $push: { reviews: review },
@@ -182,49 +194,103 @@ const addReview = asyncHandler( async (req, res) => {
             _id: 1,
             rating: 1,
             avgRating: 1,
-            reviewCount: 1
+            reviewCount: 1,
+            tags: 1
         },
         new: true
     })
-    addedReview.rating = 0.93
-    addedReview.avgRating = 1000
-    addedReview.save()
-    console.log(addedReview)
-    res.status((addedReview) ? _code.ok : _code.badRequest).json(_msg.success)
+    //Tag update
+    if (!media) throw _mw.error.send(res, _code.badRequest, _msg.failed)
+
+    media.avgRating = _util.average(media.avgRating, media.reviewCount, review.rating)
+    media.rating = _util.trendiness(media.avgRating, media.reviewCount)
+    media.save()
+
+    req.params.tagId = media.tags
+    req.body.rating = media.rating
+    const tagIds = media.tags.map(e => mongoose.Types.ObjectId(e._id))
+    
+    await _tagContext.updateMany({ _id: { $in: tagIds }, "mediaEmbedded._id": media._id}, { $set: { "mediaEmbedded.$.rating": media.rating}})
+    
+    //Account update
+    await _accountContext.findByIdAndUpdate({ _id: review._userId }, { $push: { "reviews": { rating: review.rating, comment: review.comment, _mediaId: mediaId } }})
+    res.status(_code.ok).json(_msg.success)
+
 })
 
-// //@DELETE: "/api/accounts/_ACCOUNT_ID_/tags" 
-// //@Access: PROTECTED
-// //@Roles: ADMIN
-// //@Description: Brise listu tagova [tags] u account
-// const removeFollowingTags = asyncHandler( async (req, res) => {
-//     const accountId = req.params.accountId
-//     const removeTags = req.body
+//@DELETE: "/api/media/_MEDIA_ID_/reviews" 
+//@Access: PROTECTED
+//@Roles: ADMIN
+//@Description: Dodaje listu tagova [tags] u account
+const deleteReview = asyncHandler( async (req, res) => {
+    const mediaId = req.params.mediaId
+    const userId = [req.myAccount._id]
 
-//     const removedTags = await _accountContext.findOneAndUpdate({ _id: accountId }, { $pull: { "followingTags": { _id: { $in: removeTags }}}}, { new: true })
+    const media = await _mediaContext.findOneAndUpdate({ 
+        _id: mediaId,
+        "reviews._userId": { $in: userId }
+    },
+    { 
+        $pull: { reviews: { _userId: userId} },
+        "$inc": { "reviewCount": -1 } 
+    }, 
+    {   
+        projection: {
+            _id: 1,
+            rating: 1,
+            avgRating: 1,
+            reviewCount: 1,
+            tags: 1,
+            reviews: { 
+                $elemMatch: { _userId: userId}
+            }
+        },
+    })
+    //Tag update
+    if (!media) throw _mw.error.send(res, _code.badRequest, _msg.failed)
+    console.log(media)
+    media.avgRating = _util.average(media.avgRating, media.reviewCount, (-media.reviews[0].rating))
+    console.log(media.avgRating)
+    // media.rating = _util.trendiness(media.avgRating, media.reviewCount)
+    // media.save()
 
-//     res.status((removedTags) ? _code.ok : _code.badRequest).json(removedTags ?? _msg.accountTagsNotFound)
-// })
-
-// //@PATCH: "/api/accounts/_ACCOUNT_ID_/tags" 
-// //@Access: PROTECTED
-// //@Roles: ADMIN
-// //@Description: Koristi se za updatovanje taga kad se update-uje sam tag dokument
-// const updateFollowingTag = asyncHandler(async (req, res) => {
-//     const accountId = req.params.accountId
-//     const tag = req.body
-
-//     if (!tag._id || !tag.name) _mw.error.send(res, _code.badRequest, _msg.wrongIdNameTag)
-
-//     const result = await _accountContext.updateOne({ _id: accountId, "followingTags._id": tag._id }, { $set: { "followingTags.$.name": tag.name }})
+    // req.params.tagId = media.tags
+    // req.body.rating = media.rating
+    // const tagIds = media.tags.map(e => mongoose.Types.ObjectId(e._id))
     
-//     if (result.modifiedCount === 0) _mw.error.send(res, _code.notFound, _msg.updatedAccountTagFailed)
+    // await _tagContext.updateMany({ _id: { $in: tagIds }, "mediaEmbedded._id": media._id}, { $set: { "mediaEmbedded.$.rating": media.rating}})
+    
+    // //Account update
+    // await _accountContext.findByIdAndUpdate({ _id: review._userId }, { $push: { "reviews": { rating: review.rating, comment: review.comment, _mediaId: mediaId } }})
+    res.status(_code.ok).json(media)
 
-//     res.status(_code.ok).json(_msg.updatedAccountTag)
-// })
+})
+
+const bulkWriteReviews = asyncHandler(async (mediaId, reviews) => {
+        const bulkOperation = reviews.map(account => { 
+        console.log(account)
+        return { "updateOne" : { "filter" : { "_id" : account._userId }, "update" : { "$pull" : { "reviews": { _mediaId: mediaId } } } } }
+    })
+    await _accountContext.bulkWrite(bulkOperation)
+    return
+})
+
 //#endregion
 //==============================================================================================================================================//
 //#region Media + Episodes
+
+
+// @HELPER:
+// @Access: PROTECTED
+// @Roles: ADMIN
+// @Description: Povezuje media sa tagovima (ili sta god vec)
+const bulkWriteEpisodes = asyncHandler(async (mediaId, episodes) => {
+    const bulkOperation = episodes.map(episode => { 
+        return { "updateOne" : { "filter" : { "_id" : episode._id }, "update" : { "$unset" : { "parent": { _id: mediaId } } } } }
+    })
+    await _mediaContext.bulkWrite(bulkOperation)
+    return
+})
 
 //#endregion
 //==============================================================================================================================================//
@@ -251,21 +317,31 @@ const connectMediaToTags = asyncHandler(async (req, res) => {
     return _msg.addedMediaToTag
 })
 
+const bulkWriteTags = asyncHandler(async (mediaId, tags) => {
+    const bulkOperation = tags.map(tag => { 
+        return { "updateOne" : { "filter" : { "_id" : tag._id }, "update" : { "$pull" : { "mediaEmbedded": {_id: mediaId} }, "$inc": { "mediaCount": -1 } } } }
+    })
+    await _tagContext.bulkWrite(bulkOperation)
+})
+
 //#endregion
 //==============================================================================================================================================//
 //#region Tags + CustomMedia
 
 module.exports = {
     //Media
-    // getAllMedia,
+    getAllMedia,
     getMedia,
     createMedia,
+    patchMedia,
+    deleteMedia,
 
     //Media + Parent
     connectChildToParent,
 
     //Meda + Reviews
     addReview,
+    deleteReview,
 
     //Media + Tags
     connectMediaToTags

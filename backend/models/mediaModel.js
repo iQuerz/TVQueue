@@ -6,7 +6,11 @@ const _enum = require("../helpers/enums")
 
 //Schema definition
 const mediaSchema = mongoose.Schema({
-    name: { type: String, index: true },
+    name: String,
+    searchName: { 
+        type: String, 
+        select: false,
+    },
     type: { type: String, enum: _enum.toValueList(_enum.media) },
     picture: String,
     description: String,
@@ -41,12 +45,12 @@ const mediaSchema = mongoose.Schema({
     
     reviews: {
         type: [{
-            _id: { type: mongoose.Types.ObjectId },
             _userId: { type: mongoose.Types.ObjectId },
             name: String,
             rating: Number,
             comment: String       
         }],
+        _id: false,
         default: undefined
     },
     episodes: {
@@ -63,16 +67,14 @@ const mediaSchema = mongoose.Schema({
                 },
             },     
         }],
-        _id: false,
         default: undefined
     },
 
     tags: {
         type: [{
-            _id: mongoose.Types.ObjectId,
+            _id: mongoose.Types.ObjectId, 
             name: String           
         }],
-        _id: false,
         default: undefined
     }    
 },
@@ -81,9 +83,17 @@ const mediaSchema = mongoose.Schema({
 })
 
 //Indexes
+//Compound index
+mediaSchema.index( {searchName: 1}, {type: 1}) 
 
 //Pre middleware
-
+mediaSchema.pre('save', function(next) {
+    if(!this.searchName && this.name) {
+        console.log("aeeee")
+        this.searchName = this.name.toLowerCase()
+    }
+    next()
+})
 //Post middleware
 
 //Helper functions

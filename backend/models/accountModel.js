@@ -40,11 +40,11 @@ const accountSchema = mongoose.Schema({
     },
     reviews: {
         type: [{
-            _id: { type: mongoose.Types.ObjectId },
             rating: Number,
             comment: String,
-            media: { type: mongoose.Types.ObjectId, ref: "Media" }        
+            _mediaId: { type: mongoose.Types.ObjectId, ref: "Media" }        
         }],
+        _id: false,
         default: undefined
     },
 

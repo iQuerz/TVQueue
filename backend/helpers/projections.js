@@ -3,6 +3,7 @@ module.exports = {
     result: {},
     default: 1,
     get __v() { this.result.__v = 0; return this },
+    get NoTimestamps() { this.result.createdAt = 0; this.result.updatedAt = 0; return this },
 
     get one() { this.default = 1; return this },
     get zero() { this.default = 0; return this },
@@ -24,10 +25,9 @@ module.exports = {
     get Description() { this.result.description = this.default; return this },
     get AiredDate() { this.result.airedDate = this.default; return this },
     get Rating() { this.result.rating = this.default; return this },
+    get AvgRating() { this.result.avgRating = this.default; return this },
     get ReviewCount() { this.result.reviewCount = this.default; return this },
     get Parent() { this.result.parent = this.default; return this },
-    get Trendiness() { this.result.trendiness = this.default; return this },
-
 
 
     //Tag
