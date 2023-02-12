@@ -20,6 +20,7 @@ router.route("/:mediaId")
 //Media + Review
 router.route("/:mediaId/reviews")
     .post(_mw.access.protect, _media.addReview)
+    .delete(_mw.access.protect, _media.deleteReview)
 
 //Media + Tags
 // router.route("/:accountId/tags")
