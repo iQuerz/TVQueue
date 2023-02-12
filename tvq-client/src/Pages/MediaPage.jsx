@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRef } from "react";
 import SelectComponent from "../Components/Custom/SelectComponent";
 import TagBubble from "../Components/Custom/TagBubble";
+import ReviewModal from "../Components/Media/ReviewModal";
 import Utility from "../Utility";
 
 
@@ -15,23 +16,24 @@ function MediaPage() {
     }
      const [rerender,setRerender] = useState(0);
     useEffect(()=>{
-        //setMedia(JSON.parse(localStorage.getItem('pickedMedia')));
         mediaID.current = localStorage.getItem('pickedMedia');
-        console.log(mediaID.current)
         fetchMedia();
     },[rerender])
+
+    const [reviewModalOpen, setReviewModalOpen] = useState(false);
+    function handleReviewModalState(state=false){
+        setReviewModalOpen(state)
+    }
 
     function fetchMedia(){
         Utility.fetchData("http://localhost:3000/api/media/"+mediaID.current)
         .then(data =>{
-            console.log(data)
             setMedia(data)
             if(data.episodes)
                 {
                     const seasonNumbers = data.episodes.map(episode => parseInt(episode.seasonEpisode.split("#")[1].split("-")[0]));
                     const maxSeasonNumber = Math.max(...seasonNumbers);
                     const seasons = Array.from({ length: maxSeasonNumber }, (_, index) => ({ name: `Season-${index + 1}` }));
-                    console.log(seasons)
                     setSeasions(seasons);
                 }
         })
@@ -54,10 +56,10 @@ function MediaPage() {
             <Box className="flex-right" width={"var(--ui-width)"}>
                 <img src={media.picture} className="media-image"></img>
                 <Box className="flex-down" marginLeft={"1em"}>
-                    {media.parent ? <Typography onClick={()=>{
+                    {media.parent ? <Typography textAlign={"center"} onClick={()=>{
                         localStorage.setItem('pickedMedia', media.parent._id)
                         setRerender(rerender+1)
-                    }} className="clickable-link" variant="h2"> {"Show : " + media.parent.name} </Typography> : ""}
+                    }} className="clickable-link" variant="h2"> {"Show: " + media.parent.name} </Typography> : ""}
                     <Typography variant="h3">{media.name} ({media.airedDate ? media.airedDate.substring(0,4) : ""})</Typography>
                     <Typography variant="h4">{media.rating ? media.rating+"/10" : "no rating"}</Typography>
                     <Box className="flex-right" sx={{flexWrap:"wrap"}}>
@@ -127,17 +129,17 @@ function MediaPage() {
                 :""
             }
 
-            {media.reviews?
-                <Box className="media-section">
-                    <Typography width={"100%"} variant="h4">Reviews: <Button variant="contained" size="large">Add Yours</Button></Typography>
-                    {
-                        media.reviews.map((review,index) => {
-                            return(<Typography variant="h6" key={index}>{review.value}, "{review.comment}"</Typography>)
-                        })
-                    }
-                </Box>
-                :""
-            }
+            
+            <ReviewModal open={reviewModalOpen} onClick={handleReviewModalState}></ReviewModal>
+            <Box className="media-section">
+                <Typography width={"100%"} variant="h4">Reviews: <Button variant="contained" size="large" onClick={()=>{handleReviewModalState(true)}}>Add Yours</Button></Typography>
+                {media.reviews?
+                    media.reviews.map((review,index) => {
+                        return(<Typography variant="h6" key={index}>{review.value}, "{review.comment}"</Typography>)
+                    })
+                    :<Typography variant="h6">No reviews yet, be the first to review {media.name}!</Typography>
+                }
+            </Box>
         </Box>
     );
 }
