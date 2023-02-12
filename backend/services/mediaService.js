@@ -102,66 +102,63 @@ const deleteMedia = asyncHandler(async (req, res) => {
     //hesus, this what we get for using "embedded" type
     const removedMedia = await _mediaContext.findOneAndDelete({ _id: mediaId })
 
-    if (removedMedia.parent) 
-        await _mediaContext.updateOne({ _id: removedMedia.parent._id}, { $pull: { "episodes": { _id: mediaId } } })
+    if (removedMedia.parent) await _mediaContext.updateOne({ _id: removedMedia.parent._id}, { $pull: { "episodes": { _id: mediaId } } })
 
-    if (removedMedia.tags) {
-        console.log("Usao sam")
-        const bulkOperation = removedMedia.tags.map(tag => { 
-            console.log(tag)
-            return { "updateOne" : { "filter" : { "_id" : tag._id }, "update" : { "$pull" : { "mediaEmbedded": {_id: mediaId} }, "$inc": { "mediaCount": -1 } } } }
-        })
-        await _tagContext.bulkWrite(bulkOperation)
-    }
+    if (removedMedia.tags?.length > 0) bulkWriteTags(mediaId, removedMedia.tags)
+    // {
+    //     const bulkOperation = removedMedia.tags.map(tag => { 
+    //         return { "updateOne" : { "filter" : { "_id" : tag._id }, "update" : { "$pull" : { "mediaEmbedded": {_id: mediaId} }, "$inc": { "mediaCount": -1 } } } }
+    //     })
+    //     await _tagContext.bulkWrite(bulkOperation)
+    // }
 
-    if (removedMedia.reviews) {
-        const bulkOperation = removedMedia.reviews.map(account => { 
-            console.log(account)
-            return { "updateOne" : { "filter" : { "_id" : account._userId }, "update" : { "$pull" : { "reviews": { _mediaId: mediaId } } } } }
-        })
-        await _accountContext.bulkWrite(bulkOperation)
-    }
+    if (removedMedia.reviews?.length > 0) bulkWriteReviews(mediaId, removedMedia.reviews)
+    // {
+    //     const bulkOperation = removedMedia.reviews.map(account => { 
+    //         console.log(account)
+    //         return { "updateOne" : { "filter" : { "_id" : account._userId }, "update" : { "$pull" : { "reviews": { _mediaId: mediaId } } } } }
+    //     })
+    //     await _accountContext.bulkWrite(bulkOperation)
+    // }
 
-    if (removedMedia.episodes) {
-        const bulkOperation = removedMedia.episodes.map(episode => { 
-            return { "updateOne" : { "filter" : { "_id" : episode._id }, "update" : { "$unset" : { "parent": { _id: mediaId } } } } }
-        })
-        await _mediaContext.bulkWrite(bulkOperation)
-    }
+    if (removedMedia.episodes?.length > 0) bulkWriteEpisodes(mediaId, removedMedia.episodes)
+    // {
+    //     const bulkOperation = removedMedia.episodes.map(episode => { 
+    //         return { "updateOne" : { "filter" : { "_id" : episode._id }, "update" : { "$unset" : { "parent": { _id: mediaId } } } } }
+    //     })
+    //     await _mediaContext.bulkWrite(bulkOperation)
+    // }
 
     res.status(_code.noContent).json(removedMedia)
 })
 
-// //@PATCH: "/api/accounts/:accountId"
-// //@Access: PROTECTED
-// //@Roles: ADMIN
-// //@Description: Updateuje samo deo prosledjen u body
-// const patchAccount = asyncHandler(async (req, res) => {
-//     const accountId = req.params.accountId
+// @PATCH: "/api/media/:mediaId"
+// @Access: PROTECTED
+// @Roles: ADMIN
+// @Description: Updateuje samo deo prosledjen u body
+const patchMedia = asyncHandler(async (req, res) => {
+    const mediaId = req.params.mediaId
+    const patch = req.body
 
-//     if(req.body.playlists) throw new Error(_msg.forbiddenPlaylist)
-//     if(req.body.reviews) throw new Error(_msg.forbiddenReviews)
-//     if(req.body.followingTags) throw new Error(_msg.forbiddenFollowingTags)
- 
-//     const updatedAccount = await _accountContext.findByIdAndUpdate({ _id: accountId }, req.body, { new: true })
+    if(patch.participated || patch.reviews || patch.episodes || patch.tags ) 
+        throw new Error(_msg.forbidden)
+
+    const oldMedia = await _mediaContext.findOneAndUpdate({ _id: mediaId }, req.body)
     
-//     res.status((updatedAccount) ? _code.ok : _code.noContent).json(_msg.updatedAccount)
-// })
+    console.log(patch)
+    console.log(oldMedia)
 
-// //@DELETE: "/api/accounts/:accountId"
-// //@Access: PROTECTED
-// //@Roles: ADMIN
-// //@Description: Brise account
-// const deleteAccount = asyncHandler(async (req, res) => {
-//     const accountId = req.params.accountId
-
-//     const exist = await _accountContext.exists({ _id: accountId })
-//     if(!exist) _mw.error.send(res, _code.notFound, _msg.accountNotFound)
-
-//     const deletedAccount = await _accountContext.findByIdAndDelete({ _id: accountId })
-    
-//     res.status((deletedAccount) ? _code.ok : _code.noContent).json(_msg.deletedAccount)
-// })
+    if (patch.parent) {
+        const child = {
+            name: patch.parent.name ?? oldMedia.parent.name ,
+            _id: mediaId, 
+            seasonEpisode: patch.parent.seasonEpisode ?? oldMedia.parent.seasonEpisode
+        }
+        await _mediaContext.updateOne({ _id: patch.parent._id}, { $push: { "episodes": child } })
+        await _mediaContext.updateOne({ _id: oldMedia.parent._id}, { $pull: { "episodes": { _id: mediaId } } })
+    }
+    res.status((oldMedia) ? _code.ok : _code.noContent).json(_msg.success)
+})
 
 
 //#endregion
@@ -246,9 +243,31 @@ const addReview = asyncHandler( async (req, res) => {
 
 })
 
+const bulkWriteReviews = asyncHandler(async (mediaId, reviews) => {
+        const bulkOperation = reviews.map(account => { 
+        console.log(account)
+        return { "updateOne" : { "filter" : { "_id" : account._userId }, "update" : { "$pull" : { "reviews": { _mediaId: mediaId } } } } }
+    })
+    await _accountContext.bulkWrite(bulkOperation)
+    return
+})
+
 //#endregion
 //==============================================================================================================================================//
 //#region Media + Episodes
+
+
+// @HELPER:
+// @Access: PROTECTED
+// @Roles: ADMIN
+// @Description: Povezuje media sa tagovima (ili sta god vec)
+const bulkWriteEpisodes = asyncHandler(async (mediaId, episodes) => {
+    const bulkOperation = episodes.map(episode => { 
+        return { "updateOne" : { "filter" : { "_id" : episode._id }, "update" : { "$unset" : { "parent": { _id: mediaId } } } } }
+    })
+    await _mediaContext.bulkWrite(bulkOperation)
+    return
+})
 
 //#endregion
 //==============================================================================================================================================//
@@ -275,6 +294,13 @@ const connectMediaToTags = asyncHandler(async (req, res) => {
     return _msg.addedMediaToTag
 })
 
+const bulkWriteTags = asyncHandler(async (mediaId, tags) => {
+    const bulkOperation = tags.map(tag => { 
+        return { "updateOne" : { "filter" : { "_id" : tag._id }, "update" : { "$pull" : { "mediaEmbedded": {_id: mediaId} }, "$inc": { "mediaCount": -1 } } } }
+    })
+    await _tagContext.bulkWrite(bulkOperation)
+})
+
 //#endregion
 //==============================================================================================================================================//
 //#region Tags + CustomMedia
@@ -284,6 +310,7 @@ module.exports = {
     getAllMedia,
     getMedia,
     createMedia,
+    patchMedia,
     deleteMedia,
 
     //Media + Parent
