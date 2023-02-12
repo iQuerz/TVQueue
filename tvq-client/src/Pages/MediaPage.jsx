@@ -62,7 +62,7 @@ function MediaPage() {
                         setRerender(rerender+1)
                     }} className="clickable-link" variant="h2"> {"Show: " + media.parent.name} </Typography> : ""}
                     <Typography variant="h3">{media.name} ({media.airedDate ? media.airedDate.substring(0,4) : ""})</Typography>
-                    <Typography variant="h4">{media.rating ? media.rating.toFixed(2)+"/10" : "no rating"}</Typography>
+                    <Typography variant="h4">{media.rating ? media.avgRating.toFixed(2)+"/10" : "no rating"}</Typography>
                     <Box className="flex-right" sx={{flexWrap:"wrap"}}>
                         {media.tags?
                             media.tags.map((tag, index) =>{
