@@ -5,10 +5,12 @@ const cors = require("cors")
 
 const _cfg = require("./helpers/configs")
 const _mw = require("./helpers/middlewares")
+const _cron = require("./scheduler/calculateRating")
 
 //Setup main
 _cfg.mongo.connectDB();
 const app = express()
+// _cron.scheduleRating.start() //enable-uj za automatsko updatovanje rating-a
 
 //Setup middleware
 app.use(cors(_cfg.server.corsOptions))
