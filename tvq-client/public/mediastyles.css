@@ -1,0 +1,71 @@
+.media-list-container{
+    width: var(--ui-width);
+    overflow: auto!important;
+    white-space: nowrap!important;
+}
+.media-list-element{
+    display: inline-block;
+    margin: 0.5em;
+    white-space: normal!important;
+}
+
+
+.media-carousel-header{
+    width: var(--ui-width);
+    margin-top: 3em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--dark-blue);
+}
+.media-carousel-header button{
+    flex-grow: 1;
+    color: var(--orange)!important;
+    border-radius: 0;
+}
+    .media-carousel-header button:hover{
+        background-color: var(--dark-blue-hover);
+    }
+.carousel-selected{
+    border-bottom: 5px solid var(--orange)!important;
+
+}
+
+
+.media-grid-container{
+    margin: 3em;
+    margin-top: 0;
+    width: var(--ui-width);
+    overflow: auto!important;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center; /*ili flex-start?*/
+}
+.media-grid-element{
+    margin: 0.5em;
+}
+
+
+.media-image{
+    height: 50vh;
+}
+
+.media-section{
+    padding: 1em 0em;
+    margin: 0;
+    border: 2px solid var(--dark-blue);
+    border-width: 1px 0;
+    width: var(--ui-width);
+}
+
+.tag-bubble{
+    padding: 0.2em 0.5em;
+    margin: 0.1em;
+    border-radius: 1em;
+    background-color: var(--orange);
+    cursor: pointer;
+}
+    .tag-bubble:hover{
+        transform: scale(1.2);
+    }
